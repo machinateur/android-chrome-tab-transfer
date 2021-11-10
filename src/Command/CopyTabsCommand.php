@@ -25,6 +25,9 @@ class CopyTabsCommand extends Command
      */
     private const DEFAULT_FILE = 'tabs.json';
 
+    /**
+     * @var string
+     */
     protected static $defaultName = 'copy-tabs';
 
     protected function configure(): void
@@ -147,6 +150,8 @@ class CopyTabsCommand extends Command
             return Command::FAILURE;
         } else {
             $output->writeln('Markdown file written successfully!');
+
+            unset($bytesWritten);
         }
 
         return Command::SUCCESS;
