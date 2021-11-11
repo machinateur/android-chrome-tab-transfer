@@ -4,8 +4,10 @@ A tool to transfer tabs from your android phone to your computer using `adb`.
 
 ## Prerequisites
 
-* PHP 7.4 or newer
-* Android Debug Bridge (platform tools including the `adb` executable)
+* [PHP 7.4 or newer](https://www.php.net/downloads.php)
+* [Composer](https://getcomposer.org/download/)
+* [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
+  (platform tools including the `adb` executable)
 
 Make sure to add the location of the platform tools to the `PATH` environment variable.
 
@@ -14,6 +16,7 @@ Make sure to add the location of the platform tools to the `PATH` environment va
 ```bash
 git clone git@github.com:machinateur/android-chrome-tab-transfer.git
 cd android-chrome-tab-transfer
+composer install
 php ./copy-tabs.php
 ```
 
