@@ -43,6 +43,10 @@ Options:
 
 ```
 
+## Credit
+
+The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078).
+
 ## License
 
 It's MIT.
