@@ -9,7 +9,8 @@ A tool to transfer tabs from your android phone to your computer using `adb`.
 * [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
   (platform tools including the `adb` executable)
 
-Make sure to add the location of the platform tools to the `PATH` environment variable.
+Make sure to add the location of the platform tools to the `PATH` environment variable. Also make sure to activate the
+usb debugging feature under developer options on your android phone and to connect it to your computer.
 
 ## Installation
 
