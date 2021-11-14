@@ -160,12 +160,15 @@ class CopyTabsCommand extends Command
             . join(
                 PHP_EOL, array_map(function (array $entry) use ($argumentPort): string {
                     $url = $entry['url'];
+                    $title = $entry['title'] ?: $url;
                     $url = rawurlencode($url);
 
-                    return sprintf("curl 'http://localhost:{$argumentPort}/json/new?%s'", $url);
+                    return sprintf('# %s', $title)
+                        . PHP_EOL
+                        . sprintf("curl 'http://localhost:{$argumentPort}/json/new?%s'", $url)
+                        . PHP_EOL;
                 }, $jsonArray)
-            )
-            . PHP_EOL;
+            );
 
         $this->writeFileContent($output, "{$argumentFile}-reopen", 'sh', $bashString);
 
