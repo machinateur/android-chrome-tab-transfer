@@ -63,7 +63,7 @@ The inspiration for this tool was [this android stackexchange answer](https://an
 ## How it works
 
 The `adb`, which is part of the android platform tools, is used to forward http calls via the usb connection. What http
-calls, you ask? I present to you the[chrome devtools protocol](https://chromedevtools.github.io/devtools-protocol/).
+calls, you ask? I present to you the [chrome devtools protocol](https://chromedevtools.github.io/devtools-protocol/).
 
 > The Chrome DevTools Protocol allows for tools to instrument, inspect, debug and profile Chromium, Chrome and other
 > Blink-based browsers.
