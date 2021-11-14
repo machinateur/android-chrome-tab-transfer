@@ -8,9 +8,11 @@ A tool to transfer google chrome tabs from your android phone to your computer u
 * [Composer](https://getcomposer.org/download/)
 * [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
   (platform tools including the `adb` executable)
+* [Google Chrome Browser](https://play.google.com/store/apps/details?id=com.android.chrome) on your android phone
 
 Make sure to add the location of the platform tools to the `PATH` environment variable. Also make sure to activate the
-usb debugging feature under developer options on your android phone and to connect it to your computer.
+usb debugging feature under developer options on your android phone and to connect it to your computer. The browser has
+to be running for this tool to work properly.
 
 ## Installation
 
@@ -28,6 +30,8 @@ The command will generate three new files:
 * A `tabs.json` file containing the raw json of your tab's data.
 * A `tabs-gist.md` file containing a markdown formatted list of all your tabs.
 * A `tabs-reopen.sh` bash script containing a curl call for each of your tabs to reopen.
+
+The filename and port can be changed using the command arguments and options described below.
 
 ```bash
 Description:
@@ -50,6 +54,8 @@ Options:
 
 ```
 
+To reopen the tabs on another device, connect it instead, allow usb debugging and start the google chrome browser. 
+
 ## Credit
 
 The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078).
@@ -63,7 +69,7 @@ calls, you ask? I present to you the[chrome devtools protocol](https://chromedev
 > Blink-based browsers.
 
 It exposes endpoints to retrieve all currently open tabs and also one to open a new tab. The former is used to download
-tab information, while the latter one can be used by the generated `sh` script to reopen the tabs on your new device.
+tab information, while the latter one can be used by the generated `sh` script to reopen the tabs on another device.
 
 ## License
 
