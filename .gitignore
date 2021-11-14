@@ -3,4 +3,5 @@
 /vendor/
 
 tabs.json
-tabs.json.md
+tabs-gist.md
+tabs-reopen.sh

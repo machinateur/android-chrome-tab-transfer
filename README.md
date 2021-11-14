@@ -1,6 +1,6 @@
 # android-chrome-tab-transfer
 
-A tool to transfer tabs from your android phone to your computer using `adb`.
+A tool to transfer google chrome tabs from your android phone to your computer using `adb`.
 
 ## Prerequisites
 
@@ -22,6 +22,12 @@ php ./copy-tabs.php
 ```
 
 ## Usage
+
+The command will generate three new files:
+
+* A `tabs.json` file containing the raw json of your tab's data.
+* A `tabs-gist.md` file containing a markdown formatted list of all your tabs.
+* A `tabs-reopen.sh` bash script containing a curl call for each of your tabs to reopen.
 
 ```bash
 Description:
@@ -47,6 +53,17 @@ Options:
 ## Credit
 
 The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078).
+
+## How it works
+
+The `adb`, which is part of the android platform tools, is used to forward http calls via the usb connection. What http
+calls, you ask? I present to you the[chrome devtools protocol](https://chromedevtools.github.io/devtools-protocol/).
+
+> The Chrome DevTools Protocol allows for tools to instrument, inspect, debug and profile Chromium, Chrome and other
+> Blink-based browsers.
+
+It exposes endpoints to retrieve all currently open tabs and also one to open a new tab. The former is used to download
+tab information, while the latter one can be used by the generated `sh` script to reopen the tabs on your new device.
 
 ## License
 

@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use JsonException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,6 +44,8 @@ class CopyTabsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Check for `adb` command availability:
+
         if (!$this->isShellCommandAvailable('adb')) {
             $output->writeln('The adb executable is not available!');
 
@@ -50,6 +53,8 @@ class CopyTabsCommand extends Command
         } else {
             $output->writeln('The adb executable is available.');
         }
+
+        // Get `port` argument:
 
         $argumentPort = (int)$input->getOption('port');
 
@@ -59,12 +64,16 @@ class CopyTabsCommand extends Command
             $output->writeln("Invalid port given, default to {$argumentPort}.");
         }
 
+        // Run `adb` command:
+
         $output->writeln('Running adb command...');
 
         $output->writeln("> adb -d forward tcp:{$argumentPort} localabstract:chrome_devtools_remote");
         $output->write(
             shell_exec("adb -d forward tcp:{$argumentPort} localabstract:chrome_devtools_remote")
         );
+
+        // Download tabs:
 
         $url = "http://localhost:{$argumentPort}/json/list";
 
@@ -80,13 +89,18 @@ class CopyTabsCommand extends Command
 
         $jsonString = @file_get_contents($url, false, $context) ?: null;
 
+        unset($url);
+
         if (null === $jsonString) {
             $output->writeln('Unable to download tabs from device! Please check the device connection!');
+            $output->writeln('Also make sure google chrome is running on the connected device.');
 
             return Command::FAILURE;
         } else {
             $output->writeln('Download successful!');
         }
+
+        // Decode json string:
 
         $output->writeln('Decoding data now...');
 
@@ -104,24 +118,20 @@ class CopyTabsCommand extends Command
             $output->writeln('Successfully decoded data.');
         }
 
-        $argumentFile = dirname(__DIR__, 2) . $input->getArgument('file');
+        // Get `file` argument:
 
-        $output->writeln("Writing json file...");
-        $output->writeln("> {$argumentFile}");
+        $argumentFile = $input->getArgument('file');
+        $argumentFile = pathinfo($argumentFile, PATHINFO_FILENAME);
 
-        $bytesWritten = @file_put_contents($argumentFile, $jsonString) ?: null;
+        assert(is_string($argumentFile));
 
-        if (null === $bytesWritten) {
-            $output->writeln('Failed to write json file!');
+        // Write `json` file:
 
-            return Command::FAILURE;
-        } else {
-            $output->writeln('Json file written successfully!');
+        $this->writeFileContent($output, $argumentFile, 'json', $jsonString);
 
-            unset($bytesWritten);
-        }
+        // Write `md` file:
 
-        $markdownString = '# Tabs'
+        $bashString = '# Tabs'
             . PHP_EOL
             . PHP_EOL
             . join(
@@ -137,22 +147,27 @@ class CopyTabsCommand extends Command
             . 'Created using [machinateur/android-chrome-tab-transfer](https://github.com/machinateur/android-chrome-tab-transfer).'
             . PHP_EOL;
 
-        $argumentFile .= '.md';
+        $this->writeFileContent($output, "{$argumentFile}-gist", 'md', $bashString);
 
-        $output->writeln("Writing markdown file...");
-        $output->writeln("> {$argumentFile}");
+        // Write `sh` file:
 
-        $bytesWritten = @file_put_contents($argumentFile, $markdownString) ?: null;
+        $bashString = '#!/bin/bash'
+            . PHP_EOL
+            . PHP_EOL
+            . '# Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
+            . PHP_EOL
+            . PHP_EOL
+            . join(
+                PHP_EOL, array_map(function (array $entry) use ($argumentPort): string {
+                    $url = $entry['url'];
+                    $url = rawurlencode($url);
 
-        if (null === $bytesWritten) {
-            $output->writeln('Failed to write markdown file!');
+                    return sprintf("curl 'http://localhost:{$argumentPort}/json/new?%s'", $url);
+                }, $jsonArray)
+            )
+            . PHP_EOL;
 
-            return Command::FAILURE;
-        } else {
-            $output->writeln('Markdown file written successfully!');
-
-            unset($bytesWritten);
-        }
+        $this->writeFileContent($output, "{$argumentFile}-reopen", 'sh', $bashString);
 
         return Command::SUCCESS;
     }
@@ -174,5 +189,34 @@ class CopyTabsCommand extends Command
                 shell_exec("$test $shellCommand")
             )
         );
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param string $file
+     * @param string $fileExtension
+     * @param string $fileContent
+     */
+    private function writeFileContent(OutputInterface $output, string $file, string $fileExtension, string $fileContent): void
+    {
+        $basePath = dirname(__DIR__, 2);
+        $filePath = "{$basePath}/{$file}.{$fileExtension}";
+
+        $output->writeln("Writing {$fileExtension} file...");
+        $output->writeln("> {$filePath}");
+
+        $bytesWritten = @file_put_contents($filePath, $fileContent) ?: null;
+
+        if (null === $bytesWritten) {
+            $message = "Failed to write {$fileExtension} file!";
+
+            $output->writeln($message);
+
+            throw new RuntimeException($message);
+        } else {
+            $fileExtension = ucfirst($fileExtension);
+
+            $output->writeln("{$fileExtension} file written successfully!");
+        }
     }
 }
