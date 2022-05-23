@@ -47,6 +47,11 @@ class CopyTabsCommand extends Command
     /**
      * @var string
      */
+    private const DEFAULT_SOCKET = 'chrome_devtools_remote';
+
+    /**
+     * @var string
+     */
     private const DEFAULT_FILE = 'tabs.json';
 
     /**
@@ -59,7 +64,8 @@ class CopyTabsCommand extends Command
         $this
             ->setDescription('A tool to transfer tabs from your android phone to your computer using `adb`.')
             ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write.', self::DEFAULT_FILE)
-            ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT);
+            ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT)
+            ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET);
     }
 
     /**
@@ -87,13 +93,23 @@ class CopyTabsCommand extends Command
             $output->writeln("Invalid port given, default to {$argumentPort}.");
         }
 
+        // Get `socket` argument:
+
+        $argumentSocket = $input->getOption('socket');
+
+        if (!is_string($argumentSocket)) {
+            $argumentSocket = self::DEFAULT_SOCKET;
+
+            $output->writeln("Invalid socket given, default to {$argumentSocket}.");
+        }
+
         // Run `adb` command:
 
         $output->writeln('Running adb command...');
 
-        $output->writeln("> adb -d forward tcp:{$argumentPort} localabstract:chrome_devtools_remote");
+        $output->writeln("> adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}");
         $output->write(
-            shell_exec("adb -d forward tcp:{$argumentPort} localabstract:chrome_devtools_remote")
+            shell_exec("adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}")
         );
 
         // Download tabs:
