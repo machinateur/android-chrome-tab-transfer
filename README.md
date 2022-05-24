@@ -55,7 +55,7 @@ Options:
 
 ```
 
-To reopen the tabs on another device, connect it instead, allow usb debugging and start the google chrome browser. 
+To reopen the tabs on another device, connect it instead, allow usb debugging and start the google chrome browser.
 
 ## Credit
 
@@ -71,6 +71,12 @@ calls, you ask? I present to you the [chrome devtools protocol](https://chromede
 
 It exposes endpoints to retrieve all currently open tabs and also one to open a new tab. The former is used to download
 tab information, while the latter one can be used by the generated `sh` script to reopen the tabs on another device.
+
+## Chrome Beta/Canary support
+
+This is an advanced use-case. For details on how to use this tool with the beta or canary channels of the Google Chrome
+browser on Android, read [#2](https://github.com/machinateur/android-chrome-tab-transfer/issues/2). Extended technical
+knowledge is advised.
 
 ## License
 
