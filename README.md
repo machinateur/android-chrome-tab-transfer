@@ -45,6 +45,7 @@ Arguments:
 
 Options:
   -p, --port=PORT       The port to forward requests using `adb`. [default: 9222]
+  -s, --socket=SOCKET   The socket to forward requests using `adb`. [default: "chrome_devtools_remote"]
   -h, --help            Display help for the given command. When no command is given display help for the copy-tabs command
   -q, --quiet           Do not output any message
   -V, --version         Display this application version
