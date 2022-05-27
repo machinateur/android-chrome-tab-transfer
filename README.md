@@ -59,7 +59,8 @@ To reopen the tabs on another device, connect it instead, allow usb debugging an
 
 ## Credit
 
-The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078).
+The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078)
+.
 
 ## How it works
 
@@ -77,6 +78,21 @@ tab information, while the latter one can be used by the generated `sh` script t
 This is an advanced use-case. For details on how to use this tool with the beta or canary channels of the Google Chrome
 browser on Android, read [#2](https://github.com/machinateur/android-chrome-tab-transfer/issues/2). Extended technical
 knowledge is advised.
+
+## Building phar from source
+
+The phar can be built from source using [box](https://github.com/box-project/box). If you don't have it installed yet,
+you can by running the following command:
+
+```bash
+composer global require humbug/box
+```
+
+The configuration may be customized using the `box.json` file. To build, run the following command:
+
+```bash
+box compile
+```
 
 ## License
 
