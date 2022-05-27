@@ -16,14 +16,37 @@ to be running for this tool to work properly.
 
 ## Installation
 
+### Phar
+
 ```bash
 git clone git@github.com:machinateur/android-chrome-tab-transfer.git
 cd android-chrome-tab-transfer
-composer install
-php ./copy-tabs.php
+php copy-tabs.phar
+```
+
+### Source
+
+On Windows:
+
+```bash
+git clone git@github.com:machinateur/android-chrome-tab-transfer.git
+cd android-chrome-tab-transfer
+copy-tabs.cmd
+```
+
+On Mac/Linux:
+
+```bash
+git clone git@github.com:machinateur/android-chrome-tab-transfer.git
+cd android-chrome-tab-transfer
+./copy-tabs.sh
 ```
 
 ## Usage
+
+```bash
+php copy-tabs.phar
+```
 
 The command will generate three new files:
 
@@ -31,7 +54,7 @@ The command will generate three new files:
 * A `tabs-gist.md` file containing a markdown formatted list of all your tabs.
 * A `tabs-reopen.sh` bash script containing a curl call for each of your tabs to reopen.
 
-The filename and port can be changed using the command arguments and options described below.
+The filename, port and socket name can be changed using the command arguments and options described below.
 
 ```bash
 Description:
