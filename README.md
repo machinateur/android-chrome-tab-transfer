@@ -59,7 +59,8 @@ To reopen the tabs on another device, connect it instead, allow usb debugging an
 
 ## Credit
 
-The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078).
+The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078)
+.
 
 ## How it works
 
@@ -80,8 +81,8 @@ knowledge is advised.
 
 ## Building phar from source
 
-The phar can be built from source using [box](). If you don't have it installed yet, you can by running the following
-command:
+The phar can be built from source using [box](https://github.com/box-project/box). If you don't have it installed yet,
+you can by running the following command:
 
 ```bash
 composer global require humbug/box
