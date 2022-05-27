@@ -24,12 +24,12 @@
 
 @echo off
 
-if exists copy-tabs.phar (
+if exist copy-tabs.phar (
   rem prefer phar, if present
   php copy-tabs.phar
 ) else (
   rem fallback to php script
-  if not exists vendor\ (
+  if not exist vendor\ (
     echo "Dependencies not found. Installing..."
     echo.
 
