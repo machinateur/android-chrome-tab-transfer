@@ -78,6 +78,21 @@ This is an advanced use-case. For details on how to use this tool with the beta 
 browser on Android, read [#2](https://github.com/machinateur/android-chrome-tab-transfer/issues/2). Extended technical
 knowledge is advised.
 
+## Building phar from source
+
+The phar can be built from source using [box](). If you don't have it installed yet, you can by running the following
+command:
+
+```bash
+composer global require humbug/box
+```
+
+The configuration may be customized using the `box.json` file. To build, run the following command:
+
+```bash
+box compile
+```
+
 ## License
 
 It's MIT.

@@ -1,0 +1,6 @@
+{
+  "main": "copy-tabs.php",
+  "output": null,
+  "chmod": "0700",
+  "banner-file": "LICENSE"
+}
