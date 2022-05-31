@@ -243,7 +243,7 @@ class CopyTabsCommand extends Command
      */
     private function writeFileContent(OutputInterface $output, string $file, string $fileExtension, string $fileContent): void
     {
-        $basePath = dirname(__DIR__, 2);
+        $basePath = $this->getBasePath();
         $filePath = "{$basePath}/{$file}.{$fileExtension}";
 
         $output->writeln("Writing {$fileExtension} file...");
@@ -262,5 +262,17 @@ class CopyTabsCommand extends Command
 
             $output->writeln("{$fileExtension} file written successfully!");
         }
+    }
+
+    /**
+     * @return string
+     */
+    private function getBasePath(): string
+    {
+        if (extension_loaded('phar') && strlen($path = \Phar::running(false)) > 0) {
+            return dirname($path);
+        }
+
+        return dirname(__DIR__, 2);
     }
 }
