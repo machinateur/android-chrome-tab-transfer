@@ -223,12 +223,14 @@ class CopyTabsCommand extends Command
         $isWindows = 0 === strpos(PHP_OS, 'WIN');
 
         $test = $isWindows
-            ? 'where'
-            : 'command -v';
+            ? 'cmd /c "where %s"'
+            : 'command -v %s';
 
         return is_executable(
             trim(
-                shell_exec("$test $shellCommand")
+                shell_exec(
+                    sprintf($test, $shellCommand)
+                )
             )
         );
     }
