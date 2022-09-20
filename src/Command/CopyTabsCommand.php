@@ -68,6 +68,11 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
     private const DEFAULT_FILE = 'tabs.json';
 
     /**
+     * @var int
+     */
+    private const DEFAULT_TIMEOUT = 60;
+
+    /**
      * @var string
      */
     protected static $defaultName = 'copy-tabs';
@@ -83,7 +88,8 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             ->setDescription('A tool to transfer tabs from your android phone to your computer using `adb`.')
             ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write.', self::DEFAULT_FILE)
             ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT)
-            ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET);
+            ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
+            ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request.', self::DEFAULT_TIMEOUT);
     }
 
     /**
@@ -121,6 +127,16 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             $output->writeln("Invalid socket given, default to {$argumentSocket}.");
         }
 
+        // Get `timeout` argument:
+
+        $argumentTimeout = (int)$input->getOption('timeout');
+
+        if (10 > $argumentTimeout) {
+            $argumentTimeout = self::DEFAULT_TIMEOUT;
+
+            $output->writeln("Invalid timeout given, default to {$argumentTimeout}s.");
+        }
+
         // Run `adb` command:
 
         $output->writeln('Running adb command...');
@@ -144,8 +160,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',
-                // TODO: Add timeout parameter.
-                'timeout' => 10,
+                'timeout' => $argumentTimeout,
             ],
         ]);
 

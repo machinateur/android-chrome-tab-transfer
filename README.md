@@ -63,7 +63,6 @@ Description:
 Usage:
   copy-tabs [options] [--] [<file>]
 
-Arguments:
   file                  The relative filepath to write. [default: "tabs.json"]
 
 Options:
@@ -75,6 +74,26 @@ Options:
       --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
   -n, --no-interaction  Do not ask any interactive question
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+PS D:\Project\machinateur\android-tab-transfer> php .\copy-tabs.php -h
+Description:
+  A tool to transfer tabs from your android phone to your computer using `adb`.
+
+Usage:
+  copy-tabs [options] [--] [<file>]
+
+Arguments:
+  file                   The relative filepath to write. [default: "tabs.json"]
+
+Options:
+  -p, --port=PORT        The port to forward requests using `adb`. [default: 9222]
+  -s, --socket=SOCKET    The socket to forward requests using `adb`. [default: "chrome_devtools_remote"]
+  -t, --timeout=TIMEOUT  The network timeout for the download request. [default: 60]
+  -h, --help             Display help for the given command. When no command is given display help for the copy-tabs command
+  -q, --quiet            Do not output any message
+  -V, --version          Display this application version
+      --ansi|--no-ansi   Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction   Do not ask any interactive question
+  -v|vv|vvv, --verbose   Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 ```
 
