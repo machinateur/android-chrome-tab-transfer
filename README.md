@@ -56,7 +56,7 @@ The command will generate three new files:
 
 The filename, port and socket name can be changed using the command arguments and options described below.
 
-The timeout can also be changed using the `-t` argument, default is `60s`.
+The timeout can also be changed using the `-t` argument, default is `10s`, which is also the minimum required value.
 
 ```bash
 Description:
@@ -89,7 +89,7 @@ Arguments:
 Options:
   -p, --port=PORT        The port to forward requests using `adb`. [default: 9222]
   -s, --socket=SOCKET    The socket to forward requests using `adb`. [default: "chrome_devtools_remote"]
-  -t, --timeout=TIMEOUT  The network timeout for the download request. [default: 60]
+  -t, --timeout=TIMEOUT  The network timeout for the download request. [default: 10]
   -h, --help             Display help for the given command. When no command is given display help for the copy-tabs command
   -q, --quiet            Do not output any message
   -V, --version          Display this application version
@@ -134,6 +134,8 @@ Time has shown that the communication between `adb` on the computer and the andr
 errors or at least confusion. Thus, the possibility was introduced to get the error message and code of whatever
 occurred during downloading the tabs from the device. Since that information is rather technical and will only be needed
 in certain cases, it is only displayed when the download request fails and the command is run in debug mode.
+
+The output of the curl request will also be set to verbose and print directly to `STDOUT`.
 
 To run the command with debug verbosity, append `-vvv` to the end of the command:
 

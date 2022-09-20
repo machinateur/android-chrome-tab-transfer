@@ -12,6 +12,7 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
+    "ext-curl": "*",
     "ext-json": "*",
     "symfony/console": "^5.4",
     "symfony/event-dispatcher": "^5.4"

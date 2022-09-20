@@ -70,7 +70,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
     /**
      * @var int
      */
-    private const DEFAULT_TIMEOUT = 60;
+    private const DEFAULT_TIMEOUT = 10;
 
     /**
      * @var string
@@ -150,6 +150,10 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         $this->dirty = true;
 
+        // Wait for two seconds, just to be safe:
+
+        sleep(2);
+
         // Download tabs:
 
         $url = "http://localhost:{$argumentPort}/json/list";
@@ -157,24 +161,25 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $output->writeln('Downloading tabs from device...');
         $output->writeln("> {$url}");
 
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'GET',
-                'timeout' => $argumentTimeout,
-            ],
-        ]);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $argumentTimeout);
+        //curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        if ($output->isDebug()) {
+            curl_setopt($ch, CURLOPT_VERBOSE, true);
+            curl_setopt($ch, CURLOPT_STDERR, STDOUT);
+        }
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $jsonString = curl_exec($ch) ?: null;
 
-
+        $capturedErrorCode = curl_errno($ch);
         $capturedErrorMessage = null;
-        set_error_handler(function (int $errno, string $errstr) use (&$capturedErrorMessage) {
-            $capturedErrorMessage = sprintf('%s (code %d)', trim($errstr), $errno);
-        });
+        if (0 < $capturedErrorCode) {
+            $capturedErrorMessage = sprintf('%s (code %d)', curl_error($ch), $capturedErrorCode);
+        }
+        curl_close($ch);
 
-        $jsonString = file_get_contents($url, false, $context) ?: null;
-
-        restore_error_handler();
-
-        unset($url);
+        unset($url, $ch);
 
         if (null === $jsonString) {
             $output->writeln('Unable to download tabs from device! Please check the device connection!');
