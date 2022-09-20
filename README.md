@@ -52,9 +52,11 @@ The command will generate three new files:
 
 * A `tabs.json` file containing the raw json of your tab's data.
 * A `tabs-gist.md` file containing a markdown formatted list of all your tabs.
-* A `tabs-reopen.sh` bash script containing a curl call for each of your tabs to reopen.
+* A `tabs-reopen.sh` bash script containing a `curl` call for each of your tabs to reopen.
 
 The filename, port and socket name can be changed using the command arguments and options described below.
+
+The timeout can also be changed using the `-t` argument, default is `60s`.
 
 ```bash
 Description:
@@ -97,8 +99,6 @@ Options:
 
 ```
 
-To reopen the tabs on another device, connect it instead, allow usb debugging and start the google chrome browser.
-
 ## Credit
 
 The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078).
@@ -113,6 +113,14 @@ calls, you ask? I present to you the [chrome devtools protocol](https://chromede
 
 It exposes endpoints to retrieve all currently open tabs and also one to open a new tab. The former is used to download
 tab information, while the latter one can be used by the generated `sh` script to reopen the tabs on another device.
+
+## About the re-open script
+
+To reopen the tabs on another device, connect it instead, allow usb debugging and start the google chrome browser. Then
+run the generated script file. It requires `curl` to send the commands to reopen all tabs.
+
+Currently, this will not run on a Windows system without something like MINGW64 being installed. WSL/WSLv2 might also
+work.
 
 ## Chrome Beta/Canary support
 
