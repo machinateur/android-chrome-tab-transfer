@@ -144,10 +144,12 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',
+                // TODO: Add timeout parameter.
                 'timeout' => 10,
             ],
         ]);
 
+        // TODO: Implement error handling and reporting (show in console).
         $jsonString = @file_get_contents($url, false, $context) ?: null;
 
         unset($url);
