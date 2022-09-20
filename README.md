@@ -144,7 +144,13 @@ php copy-tabs.php -vvv
 ```
 
 Make sure to activate the usb debugging feature under developer options on your android phone and to connect it to your
-computer. The browser has to be running for this tool to work properly.
+computer. The browser has to be running for this tool to work properly. If you are not sure on how to set it
+up, [here is a guide](https://developer.chrome.com/docs/devtools/remote-debugging/) on how to remotely debug an android
+phone.
+
+It's possible to gain some more insight using the device inspection built into any chrome-based browser. For that,
+navigate to `chrome://inspect/#devices` in any chrome based browser, like for example google chrome, installed on your
+computer.
 
 ## Building phar from source
 
