@@ -23,12 +23,20 @@
  * SOFTWARE.
  */
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 use App\Command\CopyTabsCommand;
 use Symfony\Component\Console\Application;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+$command = new CopyTabsCommand();
 
 $application = new Application();
-$application->add($command = new CopyTabsCommand());
+
+$dispatcher = new EventDispatcher();
+$dispatcher->addSubscriber($command);
+
+$application->setDispatcher($dispatcher);
+$application->add($command);
 $application->setDefaultCommand($command->getName());
 $application->run();

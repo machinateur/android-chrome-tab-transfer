@@ -28,17 +28,30 @@ namespace App\Command;
 use JsonException;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class CopyTabsCommand
  * @package App\Command
  */
-class CopyTabsCommand extends Command
+class CopyTabsCommand extends Command implements EventSubscriberInterface
 {
+    /**
+     * @inheritDoc
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ConsoleEvents::TERMINATE => 'onConsoleTerminate',
+        ];
+    }
+
     /**
      * @var int
      */
@@ -59,6 +72,11 @@ class CopyTabsCommand extends Command
      */
     protected static $defaultName = 'copy-tabs';
 
+    private bool $dirty = false;
+
+    /**
+     * @inheritDoc
+     */
     protected function configure(): void
     {
         $this
@@ -111,6 +129,10 @@ class CopyTabsCommand extends Command
         $output->write(
             shell_exec("adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}")
         );
+
+        // Mark the command state as dirty:
+
+        $this->dirty = true;
 
         // Download tabs:
 
@@ -240,6 +262,7 @@ class CopyTabsCommand extends Command
      * @param string $file
      * @param string $fileExtension
      * @param string $fileContent
+     * @return void
      */
     private function writeFileContent(OutputInterface $output, string $file, string $fileExtension, string $fileContent): void
     {
@@ -274,5 +297,38 @@ class CopyTabsCommand extends Command
         }
 
         return dirname(__DIR__, 2);
+    }
+
+    /**
+     * @param ConsoleTerminateEvent $event
+     * @return void
+     */
+    public function onConsoleTerminate(ConsoleTerminateEvent $event): void
+    {
+        $command = $event->getCommand();
+
+        if ($command instanceof CopyTabsCommand && true === $command->dirty) {
+            $input = $event->getInput();
+            $output = $event->getOutput();
+
+            // Get `port` argument:
+
+            $argumentPort = (int)$input->getOption('port');
+
+            if (0 >= $argumentPort) {
+                $argumentPort = self::DEFAULT_PORT;
+            }
+
+            // Run `adb` cleanup command:
+
+            $output->writeln('Running adb cleanup command...');
+
+            $this->dirty = true;
+
+            $output->writeln("> adb -d forward --remove tcp:{$argumentPort}");
+            $output->write(
+                shell_exec("adb -d forward --remove tcp:{$argumentPort}")
+            );
+        }
     }
 }
