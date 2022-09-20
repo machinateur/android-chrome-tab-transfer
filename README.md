@@ -141,6 +141,9 @@ To run the command with debug verbosity, append `-vvv` to the end of the command
 php copy-tabs.php -vvv
 ```
 
+Make sure to activate the usb debugging feature under developer options on your android phone and to connect it to your
+computer. The browser has to be running for this tool to work properly.
+
 ## Building phar from source
 
 The phar can be built from source using [box](https://github.com/box-project/box). If you don't have it installed yet,
