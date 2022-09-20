@@ -105,7 +105,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         $argumentPort = (int)$input->getOption('port');
 
-        if (!is_numeric($argumentPort)) {
+        if (0 >= $argumentPort) {
             $argumentPort = self::DEFAULT_PORT;
 
             $output->writeln("Invalid port given, default to {$argumentPort}.");
@@ -115,7 +115,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         $argumentSocket = $input->getOption('socket');
 
-        if (!is_string($argumentSocket)) {
+        if (0 === strlen($argumentSocket)) {
             $argumentSocket = self::DEFAULT_SOCKET;
 
             $output->writeln("Invalid socket given, default to {$argumentSocket}.");
