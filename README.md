@@ -16,14 +16,6 @@ to be running for this tool to work properly.
 
 ## Installation
 
-### Phar
-
-```bash
-git clone git@github.com:machinateur/android-chrome-tab-transfer.git
-cd android-chrome-tab-transfer
-php copy-tabs.phar
-```
-
 ### Source
 
 On Windows:
@@ -40,6 +32,16 @@ On Mac/Linux:
 git clone git@github.com:machinateur/android-chrome-tab-transfer.git
 cd android-chrome-tab-transfer
 ./copy-tabs.sh
+```
+
+### Phar
+
+As of now, the phar is no longer part of the repository, you'll have to build it from source, as described down below. 
+
+```bash
+git clone git@github.com:machinateur/android-chrome-tab-transfer.git
+cd android-chrome-tab-transfer
+php copy-tabs.phar
 ```
 
 ## Usage
