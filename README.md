@@ -45,7 +45,7 @@ cd android-chrome-tab-transfer
 ## Usage
 
 ```bash
-php copy-tabs.phar
+php copy-tabs.php
 ```
 
 The command will generate three new files:
@@ -82,8 +82,7 @@ To reopen the tabs on another device, connect it instead, allow usb debugging an
 
 ## Credit
 
-The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078)
-.
+The inspiration for this tool was [this android stackexchange answer](https://android.stackexchange.com/a/199496/363078).
 
 ## How it works
 
@@ -111,10 +110,24 @@ you can by running the following command:
 composer global require humbug/box
 ```
 
+Please keep in mind that global composer dependencies are discouraged, so this is the alternative:
+
+```bash
+mkdir --parents tools/box
+echo "tools/box" >> .gitignore
+composer require --working-dir=tools/box humbug/box
+```
+
 The configuration may be customized using the `box.json` file. To build, run the following command:
 
 ```bash
 box compile
+```
+
+Or, in case of using `tools/box`:
+
+```bash
+./tools/box/vendor/bin/box compile
 ```
 
 ## License
