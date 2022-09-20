@@ -26,7 +26,7 @@
 
 if test -f "copy-tabs.phar"; then
   # prefer phar, if present
-  php copy-tabs.phar
+  php copy-tabs.phar "$@"
 else
   # fallback to php script
   if [ ! -d "vendor/" ]; then
@@ -37,5 +37,5 @@ else
     composer install
   fi
 
-  php copy-tabs.php
+  php copy-tabs.php "$@"
 fi

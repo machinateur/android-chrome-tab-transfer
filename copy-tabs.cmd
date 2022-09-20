@@ -26,7 +26,7 @@
 
 if exist copy-tabs.phar (
   rem prefer phar, if present
-  php copy-tabs.phar
+  php copy-tabs.phar %*
 ) else (
   rem fallback to php script
   if not exist vendor\ (
@@ -37,5 +37,5 @@ if exist copy-tabs.phar (
     composer install
   )
 
-  php copy-tabs.php
+  php copy-tabs.php %*
 )
