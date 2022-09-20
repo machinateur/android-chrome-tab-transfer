@@ -101,6 +101,19 @@ This is an advanced use-case. For details on how to use this tool with the beta 
 browser on Android, read [#2](https://github.com/machinateur/android-chrome-tab-transfer/issues/2). Extended technical
 knowledge is advised.
 
+## Detecting network errors
+
+Time has shown that the communication between `adb` on the computer and the android device attached via cable can cause
+errors or at least confusion. Thus, the possibility was introduced to get the error message and code of whatever
+occurred during downloading the tabs from the device. Since that information is rather technical and will only be needed
+in certain cases, it is only displayed when the download request fails and the command is run in debug mode.
+
+To run the command with debug verbosity, append `-vvv` to the end of the command:
+
+```bash
+php copy-tabs.php -vvv
+```
+
 ## Building phar from source
 
 The phar can be built from source using [box](https://github.com/box-project/box). If you don't have it installed yet,

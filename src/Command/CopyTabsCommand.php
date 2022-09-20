@@ -149,14 +149,26 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             ],
         ]);
 
-        // TODO: Implement error handling and reporting (show in console).
-        $jsonString = @file_get_contents($url, false, $context) ?: null;
+
+        $capturedErrorMessage = null;
+        set_error_handler(function (int $errno, string $errstr) use (&$capturedErrorMessage) {
+            $capturedErrorMessage = sprintf('%s (code %d)', trim($errstr), $errno);
+        });
+
+        $jsonString = file_get_contents($url, false, $context) ?: null;
+
+        restore_error_handler();
 
         unset($url);
 
         if (null === $jsonString) {
             $output->writeln('Unable to download tabs from device! Please check the device connection!');
             $output->writeln('Also make sure google chrome is running on the connected device.');
+
+            if (null !== $capturedErrorMessage && $output->isDebug()) {
+                $output->writeln('Captured error message from the request:');
+                $output->writeln("> {$capturedErrorMessage}");
+            }
 
             return Command::FAILURE;
         } else {
