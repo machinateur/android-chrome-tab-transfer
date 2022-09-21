@@ -89,7 +89,8 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write.', self::DEFAULT_FILE)
             ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT)
             ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
-            ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request.', self::DEFAULT_TIMEOUT);
+            ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request.', self::DEFAULT_TIMEOUT)
+            ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution.');
     }
 
     /**
@@ -167,7 +168,6 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         //curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         if ($output->isDebug()) {
             curl_setopt($ch, CURLOPT_VERBOSE, true);
-            curl_setopt($ch, CURLOPT_STDERR, STDOUT);
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $jsonString = curl_exec($ch) ?: null;
@@ -345,6 +345,10 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             $input = $event->getInput();
             $output = $event->getOutput();
 
+            // Get `cleanup` argument:
+
+            $argumentSkipCleanup = !(bool)$input->getOption('skip-cleanup');
+
             // Get `port` argument:
 
             $argumentPort = (int)$input->getOption('port');
@@ -355,9 +359,16 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
             // Run `adb` cleanup command:
 
+            if (!$argumentSkipCleanup) {
+                $output->writeln('Skipping adb cleanup command... To dispose manually, run:');
+                $output->writeln("> adb -d forward --remove tcp:{$argumentPort}");
+
+                return;
+            }
+
             $output->writeln('Running adb cleanup command...');
 
-            $this->dirty = true;
+            $this->dirty = false;
 
             $output->writeln("> adb -d forward --remove tcp:{$argumentPort}");
             $output->write(
