@@ -226,7 +226,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         // Write `md` file:
 
-        $bashString = '# Tabs'
+        $mdString = '# Tabs'
             . PHP_EOL
             . PHP_EOL
             . join(
@@ -242,7 +242,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             . 'Created using [machinateur/android-chrome-tab-transfer](https://github.com/machinateur/android-chrome-tab-transfer).'
             . PHP_EOL;
 
-        $this->writeFileContent($output, "{$argumentFile}-gist", 'md', $bashString);
+        $this->writeFileContent($output, "{$argumentFile}-gist", 'md', $mdString);
 
         // Write `sh` file:
 
@@ -282,12 +282,18 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             ? 'cmd /c "where %s"'
             : 'command -v %s';
 
-        return is_executable(
-            trim(
-                shell_exec(
+        return array_reduce(
+            explode(PHP_EOL,
+                (string)shell_exec(
                     sprintf($test, $shellCommand)
                 )
-            )
+            ),
+            function (bool $carry, string $entry): bool {
+                $entry = trim($entry);
+
+                return $carry
+                    || (is_file($entry) && is_executable($entry));
+            }, false
         );
     }
 
