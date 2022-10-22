@@ -282,12 +282,18 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             ? 'cmd /c "where %s"'
             : 'command -v %s';
 
-        return is_executable(
-            trim(
-                shell_exec(
+        return array_reduce(
+            explode(PHP_EOL,
+                (string)shell_exec(
                     sprintf($test, $shellCommand)
                 )
-            )
+            ),
+            function (bool $carry, string $entry): bool {
+                $entry = trim($entry);
+
+                return $carry
+                    || (is_file($entry) && is_executable($entry));
+            }, false
         );
     }
 
