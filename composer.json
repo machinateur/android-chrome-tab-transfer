@@ -1,15 +1,15 @@
 {
   "name": "machinateur/android-chrome-tab-transfer",
-  "description": "A tool to transfer tabs from your android phone to your computer using `adb`.",
   "type": "project",
   "license": "MIT",
+  "description": "A tool to transfer tabs from your android phone to your computer using `adb`.",
   "authors": [
     {
-      "name": "Machinateur",
-      "email": "hello@machinateur.dev"
+      "name": "machinateur",
+      "email": "hello@machinateur.dev",
+      "homepage": "https://machinateur.dev"
     }
   ],
-  "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
     "ext-curl": "*",
