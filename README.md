@@ -104,6 +104,9 @@ tab information, while the latter one can be used by the generated `sh` script t
 To reopen the tabs on another device, connect it instead, allow usb debugging and start the google chrome browser. Then
 run the generated script file. It requires `curl` to send the commands to reopen all tabs.
 
+Please note, that in most cases there will be a dialog prompting you to allow the usb debugging access. It's advised you
+keep your phone unlocked during the process, to make sure the download request doesn't time out.
+
 Currently, this will not run on a Windows system without something like MINGW64 being installed. WSL/WSLv2 might also
 work.
 
