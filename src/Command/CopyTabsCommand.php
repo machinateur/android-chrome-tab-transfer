@@ -260,7 +260,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
                     return sprintf('# %s', $title)
                         . PHP_EOL
-                        . sprintf("curl 'http://localhost:{$argumentPort}/json/new?%s'", $url)
+                        . sprintf("curl -X PUT 'http://localhost:{$argumentPort}/json/new?%s'", $url)
                         . PHP_EOL;
                 }, $jsonArray)
             );
