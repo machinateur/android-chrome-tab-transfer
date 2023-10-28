@@ -24,7 +24,7 @@
 # SOFTWARE.
 #
 
-if test -f "copy-tabs.phar"; then
+if [ -f "copy-tabs.phar" ]; then
   # prefer phar, if present
   php copy-tabs.phar "$@"
 else

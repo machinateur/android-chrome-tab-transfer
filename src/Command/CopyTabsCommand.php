@@ -25,8 +25,6 @@
 
 namespace App\Command;
 
-use JsonException;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -144,7 +142,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         $output->writeln("> adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}");
         $output->write(
-            shell_exec("adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}")
+            (string)\shell_exec("adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}")
         );
 
         // Mark the command state as dirty:
@@ -162,22 +160,22 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $output->writeln('Downloading tabs from device...');
         $output->writeln("> {$url}");
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $argumentTimeout);
-        //curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        $ch = \curl_init();
+        \curl_setopt($ch, \CURLOPT_URL, $url);
+        \curl_setopt($ch, \CURLOPT_TIMEOUT, $argumentTimeout);
+        //\curl_setopt($ch, \CURLOPT_CONNECTTIMEOUT, 10);
         if ($output->isDebug()) {
-            curl_setopt($ch, CURLOPT_VERBOSE, true);
+            \curl_setopt($ch, \CURLOPT_VERBOSE, true);
         }
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $jsonString = curl_exec($ch) ?: null;
+        \curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
+        $jsonString = \curl_exec($ch) ?: null;
 
-        $capturedErrorCode = curl_errno($ch);
+        $capturedErrorCode = \curl_errno($ch);
         $capturedErrorMessage = null;
         if (0 < $capturedErrorCode) {
-            $capturedErrorMessage = sprintf('%s (code %d)', curl_error($ch), $capturedErrorCode);
+            $capturedErrorMessage = \sprintf('%s (code %d)', \curl_error($ch), $capturedErrorCode);
         }
-        curl_close($ch);
+        \curl_close($ch);
 
         unset($url, $ch);
 
@@ -200,8 +198,8 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $output->writeln('Decoding data now...');
 
         try {
-            $jsonArray = @json_decode($jsonString, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
+            $jsonArray = @\json_decode($jsonString, true, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
             $jsonArray = null;
         }
 
@@ -216,9 +214,9 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         // Get `file` argument:
 
         $argumentFile = $input->getArgument('file');
-        $argumentFile = pathinfo($argumentFile, PATHINFO_FILENAME);
+        $argumentFile = \pathinfo($argumentFile, \PATHINFO_FILENAME);
 
-        assert(is_string($argumentFile));
+        \assert(\is_string($argumentFile));
 
         // Write `json` file:
 
@@ -227,41 +225,41 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         // Write `md` file:
 
         $mdString = '# Tabs'
-            . PHP_EOL
-            . PHP_EOL
-            . join(
-                PHP_EOL, array_map(function (array $entry): string {
+            . \PHP_EOL
+            . \PHP_EOL
+            . \join(
+                \PHP_EOL, \array_map(static function (array $entry): string {
                     $url = $entry['url'];
                     $title = $entry['title'] ?: $url;
 
-                    return sprintf('* [%s](%s)', $title, $url);
+                    return \sprintf('* [%s](%s)', $title, $url);
                 }, $jsonArray)
             )
-            . PHP_EOL
-            . PHP_EOL
+            . \PHP_EOL
+            . \PHP_EOL
             . 'Created using [machinateur/android-chrome-tab-transfer](https://github.com/machinateur/android-chrome-tab-transfer).'
-            . PHP_EOL;
+            . \PHP_EOL;
 
         $this->writeFileContent($output, "{$argumentFile}-gist", 'md', $mdString);
 
         // Write `sh` file:
 
         $bashString = '#!/bin/bash'
-            . PHP_EOL
-            . PHP_EOL
+            . \PHP_EOL
+            . \PHP_EOL
             . '# Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
-            . PHP_EOL
-            . PHP_EOL
-            . join(
-                PHP_EOL, array_map(function (array $entry) use ($argumentPort): string {
+            . \PHP_EOL
+            . \PHP_EOL
+            . \join(
+                \PHP_EOL, \array_map(static function (array $entry) use ($argumentPort): string {
                     $url = $entry['url'];
                     $title = $entry['title'] ?: $url;
-                    $url = rawurlencode($url);
+                    $url = \rawurlencode($url);
 
-                    return sprintf('# %s', $title)
-                        . PHP_EOL
-                        . sprintf("curl -X PUT 'http://localhost:{$argumentPort}/json/new?%s'", $url)
-                        . PHP_EOL;
+                    return \sprintf('# %s', $title)
+                        . \PHP_EOL
+                        . \sprintf("curl -X PUT 'http://localhost:{$argumentPort}/json/new?%s'", $url)
+                        . \PHP_EOL;
                 }, $jsonArray)
             );
 
@@ -276,23 +274,23 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
      */
     private function isShellCommandAvailable(string $shellCommand): bool
     {
-        $isWindows = 0 === strpos(PHP_OS, 'WIN');
+        $isWindows = 0 === \strpos(PHP_OS, 'WIN');
 
         $test = $isWindows
             ? 'cmd /c "where %s"'
             : 'command -v %s';
 
-        return array_reduce(
-            explode(PHP_EOL,
-                (string)shell_exec(
-                    sprintf($test, $shellCommand)
+        return \array_reduce(
+            \explode(PHP_EOL,
+                (string)\shell_exec(
+                    \sprintf($test, $shellCommand)
                 )
             ),
-            function (bool $carry, string $entry): bool {
-                $entry = trim($entry);
+            static function (bool $carry, string $entry): bool {
+                $entry = \trim($entry);
 
                 return $carry
-                    || (is_file($entry) && is_executable($entry));
+                    || (\is_file($entry) && \is_executable($entry));
             }, false
         );
     }
@@ -312,16 +310,16 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $output->writeln("Writing {$fileExtension} file...");
         $output->writeln("> {$filePath}");
 
-        $bytesWritten = @file_put_contents($filePath, $fileContent) ?: null;
+        $bytesWritten = @\file_put_contents($filePath, $fileContent) ?: null;
 
         if (null === $bytesWritten) {
             $message = "Failed to write {$fileExtension} file!";
 
             $output->writeln($message);
 
-            throw new RuntimeException($message);
+            throw new \RuntimeException($message);
         } else {
-            $fileExtension = ucfirst($fileExtension);
+            $fileExtension = \ucfirst($fileExtension);
 
             $output->writeln("{$fileExtension} file written successfully!");
         }
@@ -332,11 +330,11 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
      */
     private function getBasePath(): string
     {
-        if (extension_loaded('phar') && strlen($path = \Phar::running(false)) > 0) {
-            return dirname($path);
+        if (\extension_loaded('phar') && \strlen($path = \Phar::running(false)) > 0) {
+            return \dirname($path);
         }
 
-        return dirname(__DIR__, 2);
+        return \dirname(__DIR__, 2);
     }
 
     /**
@@ -378,7 +376,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
             $output->writeln("> adb -d forward --remove tcp:{$argumentPort}");
             $output->write(
-                shell_exec("adb -d forward --remove tcp:{$argumentPort}")
+                (string)\shell_exec("adb -d forward --remove tcp:{$argumentPort}")
             );
         }
     }
