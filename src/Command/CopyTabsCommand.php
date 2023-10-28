@@ -250,6 +250,9 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             . '# Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
             . \PHP_EOL
             . \PHP_EOL
+            . "adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}"
+            . \PHP_EOL
+            . \PHP_EOL
             . \join(
                 \PHP_EOL, \array_map(static function (array $entry) use ($argumentPort): string {
                     $url = $entry['url'];
@@ -261,7 +264,11 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
                         . \sprintf("curl -X PUT 'http://localhost:{$argumentPort}/json/new?%s'", $url)
                         . \PHP_EOL;
                 }, $jsonArray)
-            );
+            )
+            . \PHP_EOL
+            . \PHP_EOL
+            . "adb -d forward --remove tcp:{$argumentPort}"
+            . \PHP_EOL;
 
         $this->writeFileContent($output, "{$argumentFile}-reopen", 'sh', $bashString);
 

@@ -106,7 +106,7 @@ The `adb`, which is part of the android platform tools, is used to forward http 
  calls, you ask? I present to you the [chrome devtools protocol](https://chromedevtools.github.io/devtools-protocol/).
 
 > The Chrome DevTools Protocol allows for tools to instrument, inspect, debug and profile Chromium, Chrome and other
-> Blink-based browsers.
+>  Blink-based browsers.
 
 It exposes endpoints to retrieve all currently open tabs and also one to open a new tab. The former is used to download
  tab information, while the latter one can be used by the generated `sh` script to reopen the tabs on another device.
@@ -114,13 +114,16 @@ It exposes endpoints to retrieve all currently open tabs and also one to open a 
 ## About the re-open script
 
 To reopen the tabs on another device, connect it instead, allow usb debugging and start the google chrome browser. Then
- run the generated script file. It requires `curl` to send the commands to reopen all tabs.
+ run the generated script file. It requires `curl` to send the commands to reopen all tabs, as well as `adb`.
+ The generated script will include commands to manage the debug connection, so make sure your new phone is connected
+ before running the shell script.
 
 Please note, that in most cases there will be a dialog prompting you to allow the usb debugging access. It's advised you
- keep your phone unlocked during the process, to make sure the download request doesn't time out.
+ keep your phone unlocked during the process, to make sure the request doesn't time out.
 
 Currently, this will not run on a Windows system without something like MINGW64 being installed. WSL/WSLv2 might
- also work.
+ also work. See [#18](https://github.com/machinateur/android-chrome-tab-transfer/issues/18) for more information on how
+ to repurpose the re-open script for a windows use-case.
 
 ## Chrome Beta/Canary support
 
