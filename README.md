@@ -121,9 +121,13 @@ To reopen the tabs on another device, connect it instead, allow usb debugging an
 Please note, that in most cases there will be a dialog prompting you to allow the usb debugging access. It's advised you
  keep your phone unlocked during the process, to make sure the request doesn't time out.
 
-Currently, this will not run on a Windows system without something like MINGW64 being installed. WSL/WSLv2 might
- also work. See [#18](https://github.com/machinateur/android-chrome-tab-transfer/issues/18) for more information on how
- to repurpose the re-open script for a windows use-case.
+The script to reopen all tabs will be output depending on your operating system.
+ On Windows it's `tabs-reopen.php`, on Mac and Linux it's `tabs-reopen.sh`.
+
+On Mac and Linux you will first have to make the script executable.
+
+See [#18](https://github.com/machinateur/android-chrome-tab-transfer/issues/18) for more information on how to
+ repurposethe re-open script for a windows use-case.
 
 ## Chrome Beta/Canary support
 

@@ -285,35 +285,70 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         $this->writeFileContent($output, "{$argumentFile}-gist", 'md', $mdString);
 
-        // Write `sh` file:
+        if ($this->isWindows()) {
+            // Write `cmd` file:
 
-        $bashString = '#!/bin/bash'
-            . \PHP_EOL
-            . \PHP_EOL
-            . '# Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
-            . \PHP_EOL
-            . \PHP_EOL
-            . "adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}"
-            . \PHP_EOL
-            . \PHP_EOL
-            . \join(
-                \PHP_EOL, \array_map(static function (array $entry) use ($argumentPort): string {
-                    $url = $entry['url'];
-                    $title = $entry['title'] ?: $url;
-                    $url = \rawurlencode($url);
+            $cmdString = '@echo off'
+                . \PHP_EOL
+                . \PHP_EOL
+                . ':: Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
+                . \PHP_EOL
+                . \PHP_EOL
+                . "adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}"
+                . \PHP_EOL
+                . \PHP_EOL
+                . \join(
+                    \PHP_EOL, \array_map(static function (array $entry) use ($argumentPort): string {
+                        $url = $entry['url'];
+                        $title = $entry['title'] ?: $url;
+                        $url = \rawurlencode($url);
+                        // Batch files require all `%` to be escaped with another `%`.
+                        $url = \str_replace('%', '%%', $url);
 
-                    return \sprintf('# %s', $title)
-                        . \PHP_EOL
-                        . \sprintf("curl -X PUT 'http://localhost:{$argumentPort}/json/new?%s'", $url)
-                        . \PHP_EOL;
-                }, $jsonArray)
-            )
-            . \PHP_EOL
-            . \PHP_EOL
-            . "adb -d forward --remove tcp:{$argumentPort}"
-            . \PHP_EOL;
+                        return \sprintf('# %s', $title)
+                            . \PHP_EOL
+                            // URLs must be double-quoted to work with curl, and double-quotes also escape other batch characters.
+                            . \sprintf("curl -X PUT \"http://localhost:{$argumentPort}/json/new?%s\"", $url)
+                            . \PHP_EOL;
+                    }, $jsonArray)
+                )
+                . \PHP_EOL
+                . \PHP_EOL
+                . "adb -d forward --remove tcp:{$argumentPort}"
+                . \PHP_EOL;
 
-        $this->writeFileContent($output, "{$argumentFile}-reopen", 'sh', $bashString);
+            $this->writeFileContent($output, "{$argumentFile}-reopen", 'cmd', $cmdString);
+        } else {
+            // Write `sh` file:
+
+            $bashString = '#!/bin/bash'
+                . \PHP_EOL
+                . \PHP_EOL
+                . '# Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
+                . \PHP_EOL
+                . \PHP_EOL
+                . "adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}"
+                . \PHP_EOL
+                . \PHP_EOL
+                . \join(
+                    \PHP_EOL, \array_map(static function (array $entry) use ($argumentPort): string {
+                        $url = $entry['url'];
+                        $title = $entry['title'] ?: $url;
+                        $url = \rawurlencode($url);
+
+                        return \sprintf('# %s', $title)
+                            . \PHP_EOL
+                            . \sprintf("curl -X PUT 'http://localhost:{$argumentPort}/json/new?%s'", $url)
+                            . \PHP_EOL;
+                    }, $jsonArray)
+                )
+                . \PHP_EOL
+                . \PHP_EOL
+                . "adb -d forward --remove tcp:{$argumentPort}"
+                . \PHP_EOL;
+
+            $this->writeFileContent($output, "{$argumentFile}-reopen", 'sh', $bashString);
+        }
 
         return Command::SUCCESS;
     }
@@ -324,9 +359,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
      */
     private function isShellCommandAvailable(string $shellCommand): bool
     {
-        $isWindows = 0 === \strpos(PHP_OS, 'WIN');
-
-        $test = $isWindows
+        $test = $this->isWindows()
             ? 'cmd /c "where %s"'
             : 'command -v %s';
 
@@ -343,6 +376,14 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
                     || (\is_file($entry) && \is_executable($entry));
             }, false
         );
+    }
+
+    /**
+     * @return bool
+     */
+    private function isWindows(): bool
+    {
+        return 0 === \strpos(PHP_OS, 'WIN');
     }
 
     /**
