@@ -168,6 +168,12 @@ In most cases the list was complete when re-tried.
 It was also reported in [#29](https://github.com/machinateur/android-chrome-tab-transfer/issues/29) that setting
  the `chrome://flags/#tab-group-parity-android` flag to **enabled**, this would also solve the issue.
 
+## Tab order and groups
+
+It is not guaranteed that the order of the tabs exported corresponds to the same order they were opened on your device.
+It is also currently not possible to keep tab-group associations across devices. This is a technical limitation,
+ as the endpoint does not provide those information.
+
 ## Building phar from source
 
 The phar can be built from source using [box](https://github.com/box-project/box). If you don't have it installed yet,
