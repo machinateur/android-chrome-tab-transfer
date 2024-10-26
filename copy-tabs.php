@@ -25,7 +25,7 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\Command\CopyTabsCommand;
+use Machinateur\ChromeTabTransfer\Command\CopyTabsCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 

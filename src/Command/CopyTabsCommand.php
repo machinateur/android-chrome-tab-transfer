@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-namespace App\Command;
+namespace Machinateur\ChromeTabTransfer\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
@@ -36,7 +36,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class CopyTabsCommand
- * @package App\Command
+ *
+ * @package Machinateur\ChromeTabTransfer\Command
  */
 class CopyTabsCommand extends Command implements EventSubscriberInterface
 {

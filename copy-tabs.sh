@@ -28,13 +28,15 @@ if [ -f "copy-tabs.phar" ]; then
   # prefer phar, if present
   php copy-tabs.phar "$@"
 else
+  # TODO: check composer.phar available
+
   # fallback to php script
   if [ ! -d "vendor/" ]; then
     echo "Dependencies not found. Installing..."
     echo
 
     # if no dependencies are installed, do that first
-    composer install
+    echo composerphar install
   fi
 
   php copy-tabs.php "$@"

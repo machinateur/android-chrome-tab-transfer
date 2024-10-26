@@ -28,13 +28,15 @@ if exist copy-tabs.phar (
   rem prefer phar, if present
   php copy-tabs.phar %*
 ) else (
+  rem TODO: check composer.phar available
+
   rem fallback to php script
   if not exist vendor\ (
     echo "Dependencies not found. Installing..."
     echo.
 
     rem if no dependencies are installed, do that first
-    composer install
+    php composer.phar install
   )
 
   php copy-tabs.php %*
