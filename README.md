@@ -14,7 +14,11 @@ Make sure to add the location of the platform tools to the `PATH` environment va
  usb debugging feature under developer options on your android phone and to connect it to your computer. The browser has
  to be running for this tool to work properly.
 
+Here's [how to enable USB debugging on your device](https://developer.android.com/studio/debug/dev-options.html#Enable-debugging).
+
 ## Installation
+
+### *__See [INSTALL.md](INSTALL.md) for a detailed and less technical guide.__*
 
 ### Source
 
@@ -74,12 +78,14 @@ Usage:
   copy-tabs [options] [--] [<file>]
 
 Arguments:
-  file                   The relative filepath to write. [default: "tabs.json"]
+  file                   The relative filepath to write. Only the filename is actually considered! [default: "tabs.json"]
 
 Options:
+  -d, --date|--no-date   Whether to add the date 'Y-m-d' suffix to the filename. On by Default.
   -p, --port=PORT        The port to forward requests using `adb`. [default: 9222]
   -s, --socket=SOCKET    The socket to forward requests using `adb`. [default: "chrome_devtools_remote"]
   -t, --timeout=TIMEOUT  The network timeout for the download request. [default: 10]
+  -w, --wait=WAIT        The time to wait before starting the download request (in seconds). [default: 2]
       --skip-cleanup     Skip the `adb` cleanup command execution.
   -h, --help             Display help for the given command. When no command is given display help for the copy-tabs command
   -q, --quiet            Do not output any message
@@ -122,7 +128,7 @@ Please note, that in most cases there will be a dialog prompting you to allow th
  keep your phone unlocked during the process, to make sure the request doesn't time out.
 
 The script to reopen all tabs will be output depending on your operating system.
- On Windows it's `tabs-reopen.php`, on Mac and Linux it's `tabs-reopen.sh`.
+ On Windows it's `tabs-reopen.cmd`, on Mac and Linux it's `tabs-reopen.sh`.
 
 On Mac and Linux you will first have to make the script executable.
 
