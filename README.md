@@ -159,6 +159,15 @@ It's possible to gain some more insight using the device inspection built into a
  navigate to `chrome://inspect/#devices` in any chrome based browser, like for example google chrome, installed on your
  computer.
 
+## Incomplete tab list
+
+Even though it is rare, there have been cases where the tab list was missing a small number of tabs.
+^
+In most cases the list was complete when re-tried.
+
+It was also reported in [#29](https://github.com/machinateur/android-chrome-tab-transfer/issues/29) that setting
+ the `chrome://flags/#tab-group-parity-android` flag to **enabled**, this would also solve the issue.
+
 ## Building phar from source
 
 The phar can be built from source using [box](https://github.com/box-project/box). If you don't have it installed yet,
