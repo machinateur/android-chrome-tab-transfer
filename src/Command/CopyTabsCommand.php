@@ -83,6 +83,15 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
     private bool $dirty = false;
 
+    private readonly string $date;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->date = \date('Y-m-d');
+    }
+
     /**
      * @inheritDoc
      */
@@ -90,7 +99,8 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
     {
         $this
             ->setDescription('A tool to transfer tabs from your android phone to your computer using `adb`.')
-            ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write.', self::DEFAULT_FILE)
+            ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write. Only the filename is actually considered!', self::DEFAULT_FILE)
+            ->addOption('date', 'd', InputOption::VALUE_NEGATABLE, "Whether to add the date '{$this->date}' suffix to the filename. On by Default.", true)
             ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT)
             ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
             ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request.', self::DEFAULT_TIMEOUT)
@@ -111,6 +121,14 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             return Command::FAILURE;
         } else {
             $output->writeln('The adb executable is available.');
+        }
+
+        // Get `date` argument:
+
+        $argumentDate = (bool)$input->getOption('date');
+
+        if (!$argumentDate) {
+            $output->writeln("The date segment of the filename is {$this->date}.");
         }
 
         // Get `port` argument:
@@ -236,6 +254,12 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $argumentFile = \pathinfo($argumentFile, \PATHINFO_FILENAME);
 
         \assert(\is_string($argumentFile));
+
+        // Add `date` suffix:
+
+        if ($argumentDate) {
+            $argumentFile = "{$argumentFile}_{$date}";
+        }
 
         // Write `json` file:
 
