@@ -72,6 +72,11 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
     private const DEFAULT_TIMEOUT = 10;
 
     /**
+     * @var int
+     */
+    private const DEFAULT_WAIT = 2;
+
+    /**
      * @var string
      */
     protected static $defaultName = 'copy-tabs';
@@ -89,6 +94,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT)
             ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
             ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request.', self::DEFAULT_TIMEOUT)
+            ->addOption('wait', 'w', InputOption::VALUE_REQUIRED, 'The time to wait before starting the download request (in seconds).', self::DEFAULT_WAIT)
             ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution.');
     }
 
@@ -137,6 +143,16 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             $output->writeln("Invalid timeout given, default to {$argumentTimeout}s.");
         }
 
+        // Get `wait` argument:
+
+        $argumentWait = (int)$input->getOption('wait');
+
+        if (0 >= $argumentWait || 60 < $argumentWait) {
+            $argumentWait = self::DEFAULT_WAIT;
+
+            $output->writeln("Invalid wait given, default to {$argumentWait}s.");
+        }
+
         // Run `adb` command:
 
         $output->writeln('Running adb command...');
@@ -152,9 +168,11 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         // Wait for two seconds, just to be safe:
 
-        sleep(2);
+        $output->writeln("Waiting for {$argumentWait} seconds...");
 
-        // Download tabs:
+        \sleep($argumentWait);
+
+        // Download tabs from device:
 
         $url = "http://localhost:{$argumentPort}/json/list";
 
