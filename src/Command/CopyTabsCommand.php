@@ -88,9 +88,9 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->date = \date('Y-m-d');
+
+        parent::__construct();
     }
 
     /**
