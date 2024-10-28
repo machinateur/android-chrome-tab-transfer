@@ -32,6 +32,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -113,6 +114,9 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // TODO: Use console style.
+        $console = new SymfonyStyle($input, $output);
+
         // Check for `adb` command availability:
 
         if (!$this->isShellCommandAvailable('adb')) {
@@ -258,7 +262,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         // Add `date` suffix:
 
         if ($argumentDate) {
-            $argumentFile = "{$argumentFile}_{$date}";
+            $argumentFile = "{$argumentFile}_{$this->date}";
         }
 
         // Write `json` file:
@@ -315,6 +319,9 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
                 . \PHP_EOL
                 . \PHP_EOL
                 . "adb -d forward --remove tcp:{$argumentPort}"
+                . \PHP_EOL
+                . \PHP_EOL
+                . 'pause'
                 . \PHP_EOL;
 
             $this->writeFileContent($output, "{$argumentFile}-reopen", 'cmd', $cmdString);
