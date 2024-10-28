@@ -2,7 +2,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021-2023 machinateur
+ * Copyright (c) 2021-2024 machinateur
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,15 @@
  * SOFTWARE.
  */
 
-require_once __DIR__ . '/vendor/autoload.php';
+declare(strict_types=1);
 
-use Machinateur\ChromeTabTransfer\Command\CopyTabsCommand;
-use Symfony\Component\Console\Application;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+namespace Machinateur\ChromeTabTransfer\Command;
 
-// TODO: Set up application with all commands.
-$command = new CopyTabsCommand();
+use Symfony\Component\Console\Command\Command;
 
-$application = new Application();
-
-$dispatcher = new EventDispatcher();
-$dispatcher->addSubscriber($command);
-
-$application->setDispatcher($dispatcher);
-$application->add($command);
-$application->setDefaultCommand($command->getName());
-$application->run();
+/**
+ * @see CopyTabsCommand
+ */
+class CopyTabsFromAndroid extends Command
+{
+}

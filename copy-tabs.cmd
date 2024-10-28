@@ -24,6 +24,7 @@
 
 @echo off
 
+rem TODO: move to PHP code, which is cross-platform and more reliable.
 if exist copy-tabs.phar (
   rem prefer phar, if present
   php copy-tabs.phar %*

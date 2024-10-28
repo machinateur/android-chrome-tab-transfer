@@ -39,6 +39,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Class CopyTabsCommand
  *
  * @package Machinateur\ChromeTabTransfer\Command
+ *
+ * @deprecated will be moved to CopyTabsFromAndroid command.
  */
 class CopyTabsCommand extends Command implements EventSubscriberInterface
 {

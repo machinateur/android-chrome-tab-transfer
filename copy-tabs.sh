@@ -24,6 +24,7 @@
 # SOFTWARE.
 #
 
+# TODO: move to PHP code, which is cross-platform and more reliable.
 if [ -f "copy-tabs.phar" ]; then
   # prefer phar, if present
   php copy-tabs.phar "$@"
