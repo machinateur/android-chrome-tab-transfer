@@ -150,10 +150,10 @@ At last, browse to the directory of `android-chrome-tab-transfer` and run the `c
 This will take you through the default process of copying tabs.
  It will create three new files:
 
-- `tabs_YYYy-MM-DD.json`
-- `tabs_YYYy-MM-DD-gist.md`
-- `tabs_YYYy-MM-DD-reopen.cmd`
-- `tabs_YYYy-MM-DD-reopen.sh`
+- `tabs_YYYY-MM-DD.json`
+- `tabs_YYYY-MM-DD-gist.md`
+- `tabs_YYYY-MM-DD-reopen.cmd`
+- `tabs_YYYY-MM-DD-reopen.sh`
 
 The `YYYY-MM-DD` is a placeholder for today's date.
 
