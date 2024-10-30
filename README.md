@@ -101,7 +101,7 @@ Options:
 Alternatively, you can also run the command as composer script:
 
 ```bash
-composer run-script copy-tabs
+composer run-script tab-transfer
 ```
 
 ## Credit
@@ -155,7 +155,7 @@ The output of the curl request will also be set to verbose and print directly to
 To run the command with debug verbosity, append `-vvv` to the end of the command:
 
 ```bash
-php copy-tabs.php -vvv
+php tab-transfer -vvv
 ```
 
 Make sure to activate the usb debugging feature under developer options on your android phone and to connect it to your

@@ -46,22 +46,28 @@ use Machinateur\ChromeTabTransfer\Command\CopyTabsFromIphone;
 use Symfony\Component\Console\Application;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+$isCompatibilityMode = true == $_SERVER['COMPATIBILITY_MODE'] ?? $_ENV['COMPATIBILITY_MODE'] ?? false;
+// TODO: Remove next line.
+$isCompatibilityMode = true;
+
 $commands = [
     new CheckEnvironment(),
     new CopyTabsFromAndroid(),
     new CopyTabsFromIphone(),
 ];
 
-$isCompatibilityMode = true == $_SERVER['COMPATIBILITY_MODE'] ?? $_ENV['COMPATIBILITY_MODE'] ?? false;
-// TODO: Remove next line.
-$isCompatibilityMode = true;
-
-if ($isCompatibilityMode) {
-    $commands[] = new LegacyCopyTabsCommand();
-}
-
 $application = new Application(APP_NAME, APP_VERSION);
 $dispatcher  = new EventDispatcher();
+
+// To allow still running the old legacy `copy-tabs` command, some additional steps are necessary.
+if ($isCompatibilityMode) {
+    $command    = new LegacyCopyTabsCommand();
+    $commands[] = $command;
+
+    $dispatcher->addSubscriber($command);
+
+    unset($command);
+}
 
 $application->setDispatcher($dispatcher);
 $application->addCommands($commands);
