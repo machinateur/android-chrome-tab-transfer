@@ -20,7 +20,8 @@
     "ext-curl": "*",
     "ext-json": "*",
     "symfony/console": "^5.4",
-    "symfony/event-dispatcher": "^5.4"
+    "symfony/event-dispatcher": "^5.4",
+    "symfony/process": "^5.4"
   },
   "require-dev": {
     "humbug/box": "^3.16"

@@ -27,9 +27,17 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Command;
 
+use Machinateur\ChromeTabTransfer\Driver\AndroidDebugBridge;
 use Symfony\Component\Console\Command\Command;
 
 /**
+ * - uses {@see AndroidDebugBridge} driver
+ *
+ * - will support the reopen script as before
+ *
+ * - lifecycle will require second ADB process start
+ * - supports --skip-cleanup for legacy reasons with the old implementation
+ *
  * @see CopyTabsCommand
  */
 class CopyTabsFromAndroid extends Command

@@ -25,21 +25,23 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\Command;
+namespace Machinateur\ChromeTabTransfer\FileTemplate;
 
-use Machinateur\ChromeTabTransfer\Driver\IosWebkitDebugProxy;
-use Symfony\Component\Console\Command\Command;
-
-/**
- * - uses {@see IosWebkitDebugProxy} driver
- *
- * - will not support reopen script (for now, until I find a way to open tabs on iOS)
- *   maybe using https://github.com/sirn-se/websocket-php will be an option to control the websocket command directly
- *
- * - background process will be running continuously
- *
- * @see https://github.com/google/ios-webkit-debug-proxy
- */
-class CopyTabsFromIphone extends Command
+class JsonFileTemplate extends AbstractFileTemplate
 {
+    public function getFileExtension(): string
+    {
+        return 'json';
+    }
+
+    public function render(): string
+    {
+        try {
+            return \json_encode($this->jsonArray, \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION);
+        } catch (\JsonException) {
+            // We must not throw an exception during the `__toString()` call. Therefor signal with an empty string
+            //  that the file should not be written at all (default behaviour with notice in output).
+            return '';
+        }
+    }
 }

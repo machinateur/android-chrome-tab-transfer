@@ -392,7 +392,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
      */
     private function isWindows(): bool
     {
-        return 0 === \strpos(PHP_OS, 'WIN');
+        return 0 === \strpos(\PHP_OS, 'WIN');
     }
 
     /**

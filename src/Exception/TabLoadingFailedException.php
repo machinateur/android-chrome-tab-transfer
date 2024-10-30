@@ -25,21 +25,17 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\Command;
+namespace Machinateur\ChromeTabTransfer\Exception;
 
-use Machinateur\ChromeTabTransfer\Driver\IosWebkitDebugProxy;
-use Symfony\Component\Console\Command\Command;
-
-/**
- * - uses {@see IosWebkitDebugProxy} driver
- *
- * - will not support reopen script (for now, until I find a way to open tabs on iOS)
- *   maybe using https://github.com/sirn-se/websocket-php will be an option to control the websocket command directly
- *
- * - background process will be running continuously
- *
- * @see https://github.com/google/ios-webkit-debug-proxy
- */
-class CopyTabsFromIphone extends Command
+class TabLoadingFailedException extends \Exception
 {
+    public static function withoutErrorMessage(int $errorCode): self
+    {
+        return new self(\sprintf('Failed curl request with error %d', $errorCode));
+    }
+
+    public static function fromJsonException(\JsonException $exception)
+    {
+        return new self('Failed decoding json response with error: ' . $exception->getMessage(), previous: $exception);
+    }
 }

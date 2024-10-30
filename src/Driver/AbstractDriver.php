@@ -25,21 +25,29 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\Command;
+namespace Machinateur\ChromeTabTransfer\Driver;
 
-use Machinateur\ChromeTabTransfer\Driver\IosWebkitDebugProxy;
-use Symfony\Component\Console\Command\Command;
+use Machinateur\ChromeTabTransfer\TabLoader\TabLoader;
+use Machinateur\ChromeTabTransfer\TabLoader\TabLoaderInterface;
 
-/**
- * - uses {@see IosWebkitDebugProxy} driver
- *
- * - will not support reopen script (for now, until I find a way to open tabs on iOS)
- *   maybe using https://github.com/sirn-se/websocket-php will be an option to control the websocket command directly
- *
- * - background process will be running continuously
- *
- * @see https://github.com/google/ios-webkit-debug-proxy
- */
-class CopyTabsFromIphone extends Command
+abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInterface
 {
+    public function __construct(
+        protected readonly int  $port,
+        protected readonly bool $debug,
+        protected readonly int  $timeout,
+    ) {
+    }
+
+    abstract public function start(): void;
+
+    abstract public function stop(): void;
+
+    abstract public function getUrl(): string;
+
+    public function getTabLoader(): TabLoaderInterface
+    {
+        return (new TabLoader($this->getUrl(), $this->timeout))
+            ->setDebug($this->debug);
+    }
 }

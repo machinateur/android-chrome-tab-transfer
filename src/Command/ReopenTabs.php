@@ -30,7 +30,7 @@ namespace Machinateur\ChromeTabTransfer\Command;
 use Symfony\Component\Console\Command\Command;
 
 /**
- * @todo imitate functionality like reopen-tabs.sh, butt independent from system.
+ * @todo implement command to reopen tabs based on JSON file (similar to output from driver)
  */
 class ReopenTabs extends Command
 {

@@ -25,21 +25,9 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\Command;
+namespace Machinateur\ChromeTabTransfer\Driver;
 
-use Machinateur\ChromeTabTransfer\Driver\IosWebkitDebugProxy;
-use Symfony\Component\Console\Command\Command;
-
-/**
- * - uses {@see IosWebkitDebugProxy} driver
- *
- * - will not support reopen script (for now, until I find a way to open tabs on iOS)
- *   maybe using https://github.com/sirn-se/websocket-php will be an option to control the websocket command directly
- *
- * - background process will be running continuously
- *
- * @see https://github.com/google/ios-webkit-debug-proxy
- */
-class CopyTabsFromIphone extends Command
+interface DriverUrlInterface
 {
+    public function getUrl(): string;
 }
