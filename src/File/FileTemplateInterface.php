@@ -25,23 +25,11 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\FileTemplate;
+namespace Machinateur\ChromeTabTransfer\File;
 
-class JsonFileTemplate extends AbstractFileTemplate
+interface FileTemplateInterface extends \Stringable
 {
-    public function getFileExtension(): string
-    {
-        return 'json';
-    }
+    public function getFilename(): string;
 
-    public function render(): string
-    {
-        try {
-            return \json_encode($this->jsonArray, \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION);
-        } catch (\JsonException) {
-            // We must not throw an exception during the `__toString()` call. Therefor signal with an empty string
-            //  that the file should not be written at all (default behaviour with notice in output).
-            return '';
-        }
-    }
+    public function render(): string;
 }

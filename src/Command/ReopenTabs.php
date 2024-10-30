@@ -31,6 +31,8 @@ use Symfony\Component\Console\Command\Command;
 
 /**
  * @todo implement command to reopen tabs based on JSON file (similar to output from driver)
+ *
+ * - also allow to generate a script from a json file
  */
 class ReopenTabs extends Command
 {

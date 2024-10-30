@@ -2,7 +2,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021-2023 machinateur
+ * Copyright (c) 2021-2024 machinateur
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,25 @@
  * SOFTWARE.
  */
 
-require_once __DIR__ . '/vendor/autoload.php';
+declare(strict_types=1);
 
-use Machinateur\ChromeTabTransfer\Command\CopyTabsCommand;
-use Symfony\Component\Console\Application;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+namespace Machinateur\ChromeTabTransfer\File;
 
-// TODO: Set up application with all commands.
-$command = new CopyTabsCommand();
+class JsonFile extends AbstractFileTemplate
+{
+    public function getExtension(): string
+    {
+        return 'json';
+    }
 
-$application = new Application();
-
-$dispatcher = new EventDispatcher();
-$dispatcher->addSubscriber($command);
-
-$application->setDispatcher($dispatcher);
-$application->add($command);
-$application->setDefaultCommand($command->getName());
-$application->run();
+    public function render(): string
+    {
+        try {
+            return \json_encode($this->jsonArray, \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION);
+        } catch (\JsonException) {
+            // We must not throw an exception during the `__toString()` call. Therefor signal with an empty string
+            //  that the file should not be written at all (default behaviour with notice in output).
+            return '';
+        }
+    }
+}

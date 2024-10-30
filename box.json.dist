@@ -1,5 +1,5 @@
 {
-  "main": "copy-tabs.php",
+  "main": "tab-transfer.php",
   "output": null,
   "chmod": "0700",
   "banner-file": "LICENSE"

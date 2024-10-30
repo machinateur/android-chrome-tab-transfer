@@ -25,33 +25,26 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\FileTemplate;
+namespace Machinateur\ChromeTabTransfer\Exception;
 
-use Machinateur\ChromeTabTransfer\FileTemplate\FileTemplateInterface;
-
-class MarkdownFileTemplate extends AbstractFileTemplate
+class CopyTabsException extends \Exception
 {
-    public function getFileExtension(): string
+    public static function fromTabLoadingFailedException(TabLoadingFailedException $exception): self
     {
-        return 'md';
+        // TODO: Check $exception contents to refine message directly in here, instead of in the command code.
+
+        return new self('Failed to copy tabs from device!', previous: $exception);
     }
 
-    public function render(): string
+    public static function forEmptyResult(string $url): self
     {
-        return '# Tabs'
-            . \PHP_EOL
-            . \PHP_EOL
-            . \join(
-                \PHP_EOL, \array_map(static function (array $entry): string {
-                    $url   = $entry['url'];
-                    $title = $entry['title'] ?: $url;
+        // TODO: Use $url in error message.
 
-                    return \sprintf('* [%s](%s)', $title, $url);
-                }, $this->jsonArray)
-            )
-            . \PHP_EOL
-            . \PHP_EOL
-            . 'Created using [machinateur/android-chrome-tab-transfer](https://github.com/machinateur/android-chrome-tab-transfer).'
-            . \PHP_EOL;
+        return new self('Failed to copy tabs from device! Empty result.');
+    }
+
+    public static function fromFileTemplateDumpException(FileTemplateDumpException $exception): self
+    {
+        return new self('Failed to copy tabs from device! ' . $exception->getMessage(), previous: $exception);
     }
 }

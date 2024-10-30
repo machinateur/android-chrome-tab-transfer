@@ -25,36 +25,55 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer;
+namespace Machinateur\ChromeTabTransfer\Shared;
 
-final class Platform
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+
+trait ConsoleTrait
 {
-    private function __construct()
-    {}
+    protected OutputInterface $output;
+    protected InputInterface  $input;
 
-    public static function isWindows(): bool
+    public function __construct()
     {
-        return 0 === \strpos(\PHP_OS, 'WIN');
+        $this->output = new NullOutput();
+        $this->input  = new ArrayInput([]);
     }
 
-    /**
-     * Extract a reference to a class-private property.
-     *
-     * This is a last-resort approach. Use with care. You have been warned.
-     *
-     * @see https://ocramius.github.io/blog/accessing-private-php-class-members-without-reflection/
-     */
-    public static function & extractPropertyReference(object $object, string $propertyName): mixed
+    public function getOutput(): OutputInterface
     {
-        $value = & \Closure::bind(function & () use ($propertyName) {
-            return $this->{$propertyName};
-        }, $object, $object)->__invoke();
-
-        return $value;
+        return $this->output;
     }
 
-    public static function isPhar(): bool
+    public function setOutput(OutputInterface $output): static
     {
-        return '' !== \Phar::running();
+        $this->output = $output;
+        return $this;
+    }
+
+    public function getInput(): InputInterface
+    {
+        return $this->input;
+    }
+
+    public function setInput(InputInterface $input): static
+    {
+        $this->input = $input;
+        return $this;
+    }
+
+    public function getConsole(): Console
+    {
+        return new Console($this->input, $this->output);
+    }
+
+    public function setConsole(Console $console): static
+    {
+        $this->input  = $console->input;
+        $this->output = $console->output;
+        return $this;
     }
 }

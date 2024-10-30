@@ -32,7 +32,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -40,9 +39,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @package Machinateur\ChromeTabTransfer\Command
  *
- * @deprecated will be moved to CopyTabsFromAndroid command.
+ * @deprecated Will be removed at some point in the future.
  */
-class CopyTabsCommand extends Command implements EventSubscriberInterface
+class LegacyCopyTabsCommand extends Command implements EventSubscriberInterface
 {
     /**
      * @inheritDoc
@@ -103,11 +102,11 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
         $this
             ->setDescription('A tool to transfer tabs from your android phone to your computer using `adb`.')
             ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write. Only the filename is actually considered!', self::DEFAULT_FILE)
-            ->addOption('date', 'd', InputOption::VALUE_NEGATABLE, "Whether to add the date '{$this->date}' suffix to the filename. On by Default.", true)
+            ->addOption('date', 'd', InputOption::VALUE_NEGATABLE, "Whether to add the date `{$this->date}` suffix to the filename. Active by Default.", true)
             ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT)
             ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
-            ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request.', self::DEFAULT_TIMEOUT)
-            ->addOption('wait', 'w', InputOption::VALUE_REQUIRED, 'The time to wait before starting the download request (in seconds).', self::DEFAULT_WAIT)
+            ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request (at least 10 seconds).', self::DEFAULT_TIMEOUT)
+            ->addOption('wait', 'w', InputOption::VALUE_REQUIRED, 'The time to wait before starting the download request (between 0 and 60 seconds).', self::DEFAULT_WAIT)
             ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution.');
     }
 
@@ -116,8 +115,9 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // TODO: Use console style.
-        $console = new SymfonyStyle($input, $output);
+        $output->writeln('Warning: You are running the legacy version of tab-transfer.');
+        $output->writeln('         It has not been adapted for newer requirements and will be removed in the future.');
+        $output->writeln('');
 
         // Check for `adb` command availability:
 
@@ -224,7 +224,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
 
         if (null === $jsonString) {
             $output->writeln('Unable to download tabs from device! Please check the device connection!');
-            $output->writeln('Also make sure google chrome is running on the connected device.');
+            $output->writeln('Also make sure google chrome is running on the connected device and USB debugging is active in the developer settings.');
 
             if (null !== $capturedErrorMessage && $output->isDebug()) {
                 $output->writeln('Captured error message from the request:');
@@ -286,7 +286,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             )
             . \PHP_EOL
             . \PHP_EOL
-            . 'Created using [machinateur/android-chrome-tab-transfer](https://github.com/machinateur/android-chrome-tab-transfer).'
+            . 'Created using [machinateur/tab-transfer](https://github.com/machinateur/tab-transfer).'
             . \PHP_EOL;
 
         $this->writeFileContent($output, "{$argumentFile}-gist", 'md', $mdString);
@@ -297,7 +297,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             $cmdString = '@echo off'
                 . \PHP_EOL
                 . \PHP_EOL
-                . ':: Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
+                . ':: Created using machinateur/tab-transfer (https://github.com/machinateur/tab-transfer).'
                 . \PHP_EOL
                 . \PHP_EOL
                 . "adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}"
@@ -333,7 +333,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
             $bashString = '#!/bin/bash'
                 . \PHP_EOL
                 . \PHP_EOL
-                . '# Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
+                . '# Created using machinateur/tab-transfer (https://github.com/machinateur/tab-transfer).'
                 . \PHP_EOL
                 . \PHP_EOL
                 . "adb -d forward tcp:{$argumentPort} localabstract:{$argumentSocket}"
@@ -445,7 +445,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
     {
         $command = $event->getCommand();
 
-        if ($command instanceof CopyTabsCommand && true === $command->dirty) {
+        if ($command instanceof LegacyCopyTabsCommand && true === $command->dirty) {
             $input = $event->getInput();
             $output = $event->getOutput();
 
@@ -470,7 +470,7 @@ class CopyTabsCommand extends Command implements EventSubscriberInterface
                 return;
             }
 
-            $output->writeln('Running adb cleanup command...');
+            $output->writeln('Running `adb` cleanup command...');
 
             $this->dirty = false;
 

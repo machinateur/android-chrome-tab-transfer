@@ -25,36 +25,24 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer;
+namespace Machinateur\ChromeTabTransfer\Exception;
 
-final class Platform
+use Symfony\Component\Filesystem\Exception\IOException;
+
+class FileTemplateDumpException extends \Exception
 {
-    private function __construct()
-    {}
-
-    public static function isWindows(): bool
+    public static function forExistingFile(string $filename): self
     {
-        return 0 === \strpos(\PHP_OS, 'WIN');
+        return new self('Failed to write file template! File already exists: '. $filename);
     }
 
-    /**
-     * Extract a reference to a class-private property.
-     *
-     * This is a last-resort approach. Use with care. You have been warned.
-     *
-     * @see https://ocramius.github.io/blog/accessing-private-php-class-members-without-reflection/
-     */
-    public static function & extractPropertyReference(object $object, string $propertyName): mixed
+    public static function forEmptyFileContent(string $filename): self
     {
-        $value = & \Closure::bind(function & () use ($propertyName) {
-            return $this->{$propertyName};
-        }, $object, $object)->__invoke();
-
-        return $value;
+        return new self('Failed to write file template! Empty content for file:' . $filename);
     }
 
-    public static function isPhar(): bool
+    public static function fromIOException(IOException $exception): self
     {
-        return '' !== \Phar::running();
+        return new self('Failed to write file template! Filesystem IO error: ' . $exception->getMessage());
     }
 }

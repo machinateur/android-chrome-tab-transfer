@@ -8,7 +8,7 @@ tabs-reopen.sh
 
 box.json
 
-copy-tabs.phar
+tab-transfer.phar
 
 /var/
 /node_modules/

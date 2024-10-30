@@ -25,14 +25,19 @@
 @echo off
 
 rem TODO: move to PHP code, which is cross-platform and more reliable.
-if exist copy-tabs.phar (
+if exist tab-transfer.phar (
   rem prefer phar, if present
-  php copy-tabs.phar %*
+  php tab-transfer.phar %*
 ) else (
-  rem TODO: check composer.phar available
-
   rem fallback to php script
+
   if not exist vendor\ (
+    if not exist composer.phar (
+      echo "Composer.phar not found!"
+
+      exit 1
+    )
+
     echo "Dependencies not found. Installing..."
     echo.
 
@@ -40,5 +45,5 @@ if exist copy-tabs.phar (
     php composer.phar install
   )
 
-  php copy-tabs.php %*
+  php tab-transfer.php %*
 )

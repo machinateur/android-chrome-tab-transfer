@@ -25,66 +25,64 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\Driver;
+namespace Machinateur\ChromeTabTransfer\File;
 
-use Machinateur\ChromeTabTransfer\File\FileTemplateInterface;
-use Machinateur\ChromeTabTransfer\File\JsonFile;
-use Machinateur\ChromeTabTransfer\File\MarkdownFile;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Machinateur\ChromeTabTransfer\Shared\ConsoleTrait;
 use Machinateur\ChromeTabTransfer\Shared\FileDateTrait;
-use Machinateur\ChromeTabTransfer\TabLoader\CurlTabLoader;
-use Machinateur\ChromeTabTransfer\TabLoader\TabLoaderInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 
 /**
- * @method AbstractDriver setConsole(Console $console)
- * @method AbstractDriver setInput(InputInterface $input)
- * @method AbstractDriver setOutput(OutputInterface $output)
- * @method AbstractDriver setFileDate(?\DateTimeInterface $date)
+ * @method AbstractFileTemplate setConsole(Console $console)
+ * @method AbstractFileTemplate setInput(InputInterface $input)
+ * @method AbstractFileTemplate setOutput(OutputInterface $output)
+ * @method AbstractFileTemplate setFileDate(?\DateTimeInterface $date)
  */
-abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInterface
+abstract class AbstractFileTemplate implements FileTemplateInterface
 {
     use ConsoleTrait {
         __construct as private initializeConsole;
     }
     use FileDateTrait;
 
+    public const DATE_FORMAT = 'Y-m-d';
+
     public function __construct(
-        public readonly string $file,
-        public readonly int    $port,
-        public readonly bool   $debug,
-        public readonly int    $timeout,
+        protected readonly string $file,
+        protected readonly array  $jsonArray,
     ) {
         $this->initializeConsole();
     }
 
-    abstract public function start(): void;
-
-    abstract public function stop(): void;
-
-    abstract public function getUrl(): string;
-
-    public function getTabLoader(): TabLoaderInterface
+    public function getFilename(): string
     {
-        $url = $this->getUrl();
+        $file = \pathinfo($this->file, \PATHINFO_FILENAME);
+        $dir  = \pathinfo($this->file, \PATHINFO_DIRNAME);
 
-        $this->output->writeln(\sprintf('Creating new tab loader for URL "%s" (timeout %ds)', $url, $this->timeout), OutputInterface::VERBOSITY_DEBUG);
+        if ($this->date) {
+            $file = "{$file}_{$this->date->format(self::DATE_FORMAT)}";
+        }
 
-        return (new CurlTabLoader($url, $this->timeout))
-            ->setDebug($this->debug)
-            ->setOutput($this->output);
+        $file = "{$file}.{$this->getExtension()}";
+
+        return Path::join($dir, $file);
     }
 
+    abstract public function getExtension(): string;
+
+    abstract public function render(): string;
+
     /**
-     * @return array<FileTemplateInterface>
+     * @inheritDoc
      */
-    public function getFileTemplates(array $jsonArray): array
+    final public function __toString(): string
     {
-        return [
-            new JsonFile($this->file, $jsonArray),
-            new MarkdownFile($this->file, $jsonArray),
-        ];
+        try {
+            return $this->render();
+        } catch (\Throwable) {
+            return '';
+        }
     }
 }

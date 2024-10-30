@@ -1,4 +1,4 @@
-# android-chrome-tab-transfer
+# tab-transfer
 
 A tool to transfer google chrome tabs from your android phone to your computer using `adb`.
 
@@ -25,20 +25,20 @@ Here's [how to enable USB debugging on your device](https://developer.android.co
 On Windows:
 
 ```bash
-git clone git@github.com:machinateur/android-chrome-tab-transfer.git
-cd android-chrome-tab-transfer
+git clone git@github.com:machinateur/tab-transfer.git
+cd tab-transfer
 composer install --no-dev
-copy-tabs.cmd
+tab-transfer.cmd
 ```
 
 On Mac/Linux:
 
 ```bash
-git clone git@github.com:machinateur/android-chrome-tab-transfer.git
-cd android-chrome-tab-transfer
+git clone git@github.com:machinateur/tab-transfer.git
+cd tab-transfer
 composer install --no-dev
-chmod +x ./copy-tabs.sh
-./copy-tabs.sh
+chmod +x ./tab-transfer.sh
+./tab-transfer.sh
 ```
 
 ### Phar
@@ -47,17 +47,19 @@ As of now, the phar is no longer part of the repository, you'll have to build it
  [as described down below](#building-phar-from-source). 
 
 ```bash
-git clone git@github.com:machinateur/android-chrome-tab-transfer.git
-cd android-chrome-tab-transfer
+git clone git@github.com:machinateur/tab-transfer.git
+cd tab-transfer
 composer install --dev
 composer run-script box-compile
-php copy-tabs.phar
+php tab-transfer.phar
 ```
 
 ## Usage
 
 ```bash
-php copy-tabs.php
+php tab-transfer
+# or on mac/linux
+./tab-transfer
 ```
 
 The command will generate three new files:
@@ -132,13 +134,13 @@ The script to reopen all tabs will be output depending on your operating system.
 
 On Mac and Linux you will first have to make the script executable.
 
-See [#18](https://github.com/machinateur/android-chrome-tab-transfer/issues/18) for more information on how to
+See [#18](https://github.com/machinateur/tab-transfer/issues/18) for more information on how to
  repurposethe re-open script for a windows use-case.
 
 ## Chrome Beta/Canary support
 
 This is an advanced use-case. For details on how to use this tool with the beta or canary channels of the Google Chrome
- browser on Android, read [#2](https://github.com/machinateur/android-chrome-tab-transfer/issues/2).
+ browser on Android, read [#2](https://github.com/machinateur/tab-transfer/issues/2).
  Extended technical knowledge is advised.
 
 ## Detecting network errors
@@ -171,7 +173,7 @@ Even though it is rare, there have been cases where the tab list was missing a s
 ^
 In most cases the list was complete when re-tried.
 
-It was also reported in [#29](https://github.com/machinateur/android-chrome-tab-transfer/issues/29) that setting
+It was also reported in [#29](https://github.com/machinateur/tab-transfer/issues/29) that setting
  the `chrome://flags/#tab-group-parity-android` flag to **enabled**, this would also solve the issue.
 
 ## Tab order and groups

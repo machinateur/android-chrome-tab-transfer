@@ -34,5 +34,7 @@ use Symfony\Component\Console\Command\Command;
  */
 class CheckEnvironment extends Command
 {
+    public const NAME = 'check-environment';
 
+    // TODO: Implement.
 }

@@ -27,19 +27,65 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Command;
 
+use Machinateur\ChromeTabTransfer\Driver\AbstractDriver;
 use Machinateur\ChromeTabTransfer\Driver\IosWebkitDebugProxy;
-use Symfony\Component\Console\Command\Command;
+use Machinateur\ChromeTabTransfer\Platform;
+use Machinateur\ChromeTabTransfer\Shared\Console;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * - uses {@see IosWebkitDebugProxy} driver
  *
  * - will not support reopen script (for now, until I find a way to open tabs on iOS)
  *   maybe using https://github.com/sirn-se/websocket-php will be an option to control the websocket command directly
- *
- * - background process will be running continuously
+ *     - The main issue here is that a script will not be possible then. the reopen.cmd/reopen.sh is only supported for legacy reasons with android users.
  *
  * @see https://github.com/google/ios-webkit-debug-proxy
  */
-class CopyTabsFromIphone extends Command
+class CopyTabsFromIphone extends AbstractCopyTabsCommand
 {
+    public const DEFAULT_WAIT = IosWebkitDebugProxy::DEFAULT_DELAY;
+
+    protected function configure(): void
+    {
+        parent::configure();
+
+        $definition = $this->getDefinition();
+        // Here we use some black magic to extract a reference to the `$description` property of the InputOption.
+        $argumentPortDescription = & Platform::extractPropertyReference($definition->getOption('port'), 'description');
+        // Next we simply write to that reference - et-voilà.
+        $argumentPortDescription = 'The port to forward requests through `ios_webkit_debug_proxy`.';
+
+        $this
+            ->setDescription('Transfer tabs from your iPhone\'s Chrome browser.')
+            ->addOption('wait', 'w', InputOption::VALUE_REQUIRED, 'The time to wait before starting the download request (between 0 and 60 seconds).', self::DEFAULT_WAIT)
+        ;
+    }
+
+    /**
+     * @noinspection DuplicatedCode
+     */
+    public function getDriver(Console $console): AbstractDriver
+    {
+        return new IosWebkitDebugProxy(
+            $this->getArgumentFile($console),
+            $this->getArgumentPort($console),
+            $this->getArgumentDebug($console),
+            $this->getArgumentTimeout($console),
+            $this->getArgumentWait($console),
+        );
+    }
+
+    protected function getArgumentWait(Console $console): int
+    {
+        $argumentWait = (int)$console->input->getOption('wait');
+
+        if (0 >= $argumentWait || 60 < $argumentWait) {
+            $argumentWait = self::DEFAULT_WAIT;
+
+            $console->warning("Invalid wait given, default to {$argumentWait}s.");
+        }
+
+        return $argumentWait;
+    }
 }

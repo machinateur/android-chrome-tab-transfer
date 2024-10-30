@@ -117,12 +117,13 @@ final class IosWebkitDebugProxy extends AbstractDriver
      * In contrast to the {@see AndroidDebugBridge}, this process is blocking and will remain running while the application is running.
      */
     public function __construct(
-        int                     $port    = self::DEFAULT_PORT,
-        bool                    $debug   = false,
-        int                     $timeout = self::DEFAULT_TIMEOUT,
-        protected readonly int  $delay   = self::DEFAULT_DELAY,
+        string              $file,
+        int                 $port    = self::DEFAULT_PORT,
+        bool                $debug   = false,
+        int                 $timeout = self::DEFAULT_TIMEOUT,
+        public readonly int $delay   = self::DEFAULT_DELAY,
     ) {
-        parent::__construct($port, $debug, $timeout);
+        parent::__construct($file, $port, $debug, $timeout);
 
         $command = ['ios_webkit_debug_proxy', '-F', '-c', 'null:9221,:9222-9322'];
 

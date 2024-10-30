@@ -25,21 +25,22 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\FileTemplate;
+namespace Machinateur\ChromeTabTransfer\File;
 
 use Machinateur\ChromeTabTransfer\Platform;
 
-class ReopenScriptFileTemplate extends AbstractFileTemplate
+class ReopenScriptFile extends AbstractFileTemplate
 {
     public function __construct(
+        string                  $file,
         array                   $jsonArray,
         private readonly int    $port,
         private readonly string $socket,
     ) {
-        parent::__construct($jsonArray);
+        parent::__construct($file, $jsonArray);
     }
 
-    public function getFileExtension(): string
+    public function getExtension(): string
     {
         return Platform::isWindows()
             ? 'cmd'
@@ -57,7 +58,7 @@ class ReopenScriptFileTemplate extends AbstractFileTemplate
                 '@echo off'
                 . \PHP_EOL
                 . \PHP_EOL
-                . ':: Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
+                . ':: Created using machinateur/tab-transfer (https://github.com/machinateur/tab-transfer).'
                 . \PHP_EOL
                 . \PHP_EOL
                 . "adb -d forward tcp:{$port} localabstract:{$socket}"
@@ -92,7 +93,7 @@ class ReopenScriptFileTemplate extends AbstractFileTemplate
                 '#!/bin/bash'
                 . \PHP_EOL
                 . \PHP_EOL
-                . '# Created using machinateur/android-chrome-tab-transfer (https://github.com/machinateur/android-chrome-tab-transfer).'
+                . '# Created using machinateur/tab-transfer (https://github.com/machinateur/tab-transfer).'
                 . \PHP_EOL
                 . \PHP_EOL
                 . "adb -d forward tcp:{$port} localabstract:{$socket}"

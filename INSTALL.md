@@ -92,7 +92,7 @@ This application also needs some functions to run properly.
 
 To get those on your computer, download [composer](https://getcomposer.org/) from their website.
 
-It's a `.phar` file. Please drop it to the root directory of `android-chrome-tab-transfer`.
+It's a `.phar` file. Please drop it to the root directory of `tab-transfer`.
 
 #### Direct download link
 
@@ -144,7 +144,7 @@ The Chrome app has to be kept open for this to work properly. Otherwise the conn
 
 ## Running the script
 
-At last, browse to the directory of `android-chrome-tab-transfer` and run the `copy-tabs` script.
+At last, browse to the directory of `tab-transfer` and run the `tab-transfer` script.
  On Windows it's `.cmd`, on Mac and Linux it's `.sh`.
 
 This will take you through the default process of copying tabs.

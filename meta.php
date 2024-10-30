@@ -25,11 +25,5 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\FileTemplate;
-
-interface FileTemplateInterface extends \Stringable
-{
-    public function getFileExtension(): string;
-
-    public function render(): string;
-}
+\define('APP_NAME', 'tab-transfer');
+\define('APP_VERSION', '0.5.0');

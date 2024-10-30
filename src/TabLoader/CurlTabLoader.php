@@ -28,19 +28,38 @@ declare(strict_types=1);
 namespace Machinateur\ChromeTabTransfer\TabLoader;
 
 use Machinateur\ChromeTabTransfer\Exception\TabLoadingFailedException;
+use Machinateur\ChromeTabTransfer\Shared\Console;
+use Machinateur\ChromeTabTransfer\Shared\ConsoleTrait;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class TabLoader implements TabLoaderInterface
+/**
+ * @method TabLoaderInterface setConsole(Console $console)
+ * @method TabLoaderInterface setInput(InputInterface $input)
+ * @method TabLoaderInterface setOutput(OutputInterface $output)
+ */
+class CurlTabLoader implements TabLoaderInterface
 {
+    use ConsoleTrait {
+        __construct as private initializeConsole;
+    }
+
     private bool $debug = false;
 
     public function __construct(
         private readonly string $url,
         private readonly int $timeout,
     ) {
+        $this->initializeConsole();
     }
 
     public function load(): array
     {
+        $console = $this->getConsole();
+        $console->comment('Downloading tabs from device...');
+
+        $console->writeln("> curl: {$this->url}", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
         $ch = \curl_init();
 
         \curl_setopt($ch, \CURLOPT_URL,            $this->url);
@@ -48,6 +67,9 @@ class TabLoader implements TabLoaderInterface
         //\curl_setopt($ch, \CURLOPT_CONNECTTIMEOUT, 10);
 
         if ($this->debug) {
+            $console->newLine();
+
+            // This will enable output directly to the STDERR stream of PHP.
             \curl_setopt($ch, \CURLOPT_VERBOSE,    true);
         }
 
@@ -64,19 +86,44 @@ class TabLoader implements TabLoaderInterface
 
         unset($url, $ch);
 
+        if ($this->debug) {
+            // New line after STDERR output from curl execution.
+            $console->newLine();
+        }
+
         if (null === $jsonString) {
+            $console->warning([
+                'Unable to download tabs from device! Please check the device connection!',
+                'Also make sure google chrome is running on the connected device and USB debugging is active in the developer settings.',
+            ]);
+
             if (null === $capturedErrorMessage) {
+                $console->writeln('No curl error message captured, but result was `null`.', OutputInterface::VERBOSITY_VERY_VERBOSE);
+
                 throw TabLoadingFailedException::withoutErrorMessage($capturedErrorCode);
             }
+
+            $console->writeln('Captured curl error message from the request:', OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $console->writeln("> {$capturedErrorMessage}", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             throw new TabLoadingFailedException($capturedErrorMessage);
         }
 
+        if ($this->debug) {
+            $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode(\PHP_EOL, $jsonString)));
+        }
+
+        $console->success('Successfully downloaded tabs from device!');
+
         try {
             $jsonArray = @\json_decode($jsonString, true, flags: \JSON_THROW_ON_ERROR) ?? [];
         } catch (\JsonException $exception) {
+            $console->writeln('Unable to decode json data!', OutputInterface::VERBOSITY_VERY_VERBOSE);
+
             throw TabLoadingFailedException::fromJsonException($exception);
         }
+
+        $console->writeln('Successfully decoded json data.', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         return $jsonArray;
     }
@@ -86,7 +133,7 @@ class TabLoader implements TabLoaderInterface
         return $this->debug;
     }
 
-    public function setDebug(bool $debug): TabLoader
+    public function setDebug(bool $debug): CurlTabLoader
     {
         $this->debug = $debug;
         return $this;

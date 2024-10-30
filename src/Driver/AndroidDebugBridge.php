@@ -27,8 +27,11 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Driver;
 
-use Machinateur\ChromeTabTransfer\TabLoader\TabLoader;
+use Machinateur\ChromeTabTransfer\File\ReopenScriptFile;
+use Machinateur\ChromeTabTransfer\Shared\Console;
+use Machinateur\ChromeTabTransfer\TabLoader\CurlTabLoader;
 use Machinateur\ChromeTabTransfer\TabLoader\TabLoaderInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -120,35 +123,83 @@ final class AndroidDebugBridge extends AbstractDriver
     public const DEFAULT_DELAY = 2;
 
     public function __construct(
-        int                       $port    = self::DEFAULT_PORT,
-        bool                      $debug   = false,
-        int                       $timeout = self::DEFAULT_TIMEOUT,
-        protected readonly string $socket  = self::DEFAULT_SOCKET,
-        protected readonly int    $delay   = self::DEFAULT_DELAY,
+        string                 $file,
+        int                    $port        = self::DEFAULT_PORT,
+        bool                   $debug       = false,
+        int                    $timeout     = self::DEFAULT_TIMEOUT,
+        public readonly string $socket      = self::DEFAULT_SOCKET,
+        public readonly int    $delay       = self::DEFAULT_DELAY,
+        public readonly bool   $skipCleanup = false,
     ) {
-        parent::__construct($port, $debug, $timeout);
+        parent::__construct($file, $port, $debug, $timeout);
+    }
+
+    private function run(Process $process, Console $console): void
+    {
+        $console->progressStart(10);
+
+        $process->start();
+        $process->wait();
+
+        if ($this->debug) {
+            $console->newLine();
+            $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode(\PHP_EOL, $process->getOutput())));
+            $console->newLine();
+        }
+        $console->writeln("Waiting for {$this->delay} seconds...", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+        \sleep($this->delay);
+
+        $console->progressFinish();
     }
 
     public function start(): void
     {
-        $process = new Process(['adb', '-d', 'forward', "tcp:{$this->port}", "localabstract:{$this->socket}"]);
+        $console = $this->getConsole();
+        $console->writeln(__METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
 
-        $process->start();
-        //$process->waitUntil();
+        $console->comment('Running `adb` command...');
+        $console->writeln("> adb -d forward tcp:{$this->port} localabstract:{$this->socket}", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $this->run(
+            new Process(['adb', '-d', 'forward', "tcp:{$this->port}", "localabstract:{$this->socket}"]), console: $console
+        );
 
-        \sleep($this->delay);
+        $console->writeln(__METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
     }
 
     public function stop(): void
     {
-        $process = new Process(['adb', '-d', 'forward', '--remove', "tcp:{$this->port}"]);
-        $process->start();
+        $console = $this->getConsole();
+        $console->writeln(__METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
 
-        \sleep($this->delay);
+        $console->comment('Running `adb` cleanup command...');
+        $console->writeln("> adb -d forward --remove tcp:{$this->port}", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $this->run(
+            new Process(['adb', '-d', 'forward', '--remove', "tcp:{$this->port}"]), console: $console
+        );
+
+        $console->writeln(__METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
     }
 
     public function getUrl(): string
     {
         return "http://localhost:{$this->port}/json/list";
+    }
+
+    public function getFileTemplates(array $jsonArray): array
+    {
+        $fileTemplates = parent::getFileTemplates($jsonArray);
+
+        // Only write the reopen script file, if the cleanup is done properly.
+        //  Otherwise, we are at risk of opening those tabs again on the same device.
+        if ( ! $this->skipCleanup) {
+            $this->output->writeln('Allow reopen script with cleanup enabled.', OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            $fileTemplates[] = new ReopenScriptFile($this->file, $jsonArray, $this->port, $this->socket);
+        } else {
+            $this->output->writeln('Skipping reopen script with cleanup disabled.', OutputInterface::VERBOSITY_VERY_VERBOSE);
+        }
+
+        return $fileTemplates;
     }
 }

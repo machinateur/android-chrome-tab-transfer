@@ -25,36 +25,20 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer;
+namespace Machinateur\ChromeTabTransfer\Shared;
 
-final class Platform
+trait FileDateTrait
 {
-    private function __construct()
-    {}
+    protected ?\DateTimeInterface $date = null;
 
-    public static function isWindows(): bool
+    public function getFileDate(): ?\DateTimeInterface
     {
-        return 0 === \strpos(\PHP_OS, 'WIN');
+        return $this->date;
     }
 
-    /**
-     * Extract a reference to a class-private property.
-     *
-     * This is a last-resort approach. Use with care. You have been warned.
-     *
-     * @see https://ocramius.github.io/blog/accessing-private-php-class-members-without-reflection/
-     */
-    public static function & extractPropertyReference(object $object, string $propertyName): mixed
+    public function setFileDate(?\DateTimeInterface $date): static
     {
-        $value = & \Closure::bind(function & () use ($propertyName) {
-            return $this->{$propertyName};
-        }, $object, $object)->__invoke();
-
-        return $value;
-    }
-
-    public static function isPhar(): bool
-    {
-        return '' !== \Phar::running();
+        $this->date = $date;
+        return $this;
     }
 }

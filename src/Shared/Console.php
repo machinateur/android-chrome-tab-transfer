@@ -25,24 +25,23 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\FileTemplate;
+namespace Machinateur\ChromeTabTransfer\Shared;
 
-abstract class AbstractFileTemplate implements FileTemplateInterface
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+/**
+ * Extends the symfony style without any changes.
+ *
+ * This class exposes input and output interfaces, thereby kind of depicting a "console".
+ */
+class Console extends SymfonyStyle
 {
     public function __construct(
-        protected readonly array $jsonArray,
+        public readonly InputInterface  $input,
+        public readonly OutputInterface $output,
     ) {
-    }
-
-    abstract public function getFileExtension(): string;
-
-    abstract public function render(): string;
-
-    /**
-     * @inheritDoc
-     */
-    final public function __toString(): string
-    {
-        return $this->render();
+        parent::__construct($input, $output);
     }
 }

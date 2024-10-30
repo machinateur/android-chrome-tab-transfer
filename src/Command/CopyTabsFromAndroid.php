@@ -27,8 +27,11 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Command;
 
+use Machinateur\ChromeTabTransfer\Driver\AbstractDriver;
 use Machinateur\ChromeTabTransfer\Driver\AndroidDebugBridge;
-use Symfony\Component\Console\Command\Command;
+use Machinateur\ChromeTabTransfer\Platform;
+use Machinateur\ChromeTabTransfer\Shared\Console;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * - uses {@see AndroidDebugBridge} driver
@@ -37,9 +40,76 @@ use Symfony\Component\Console\Command\Command;
  *
  * - lifecycle will require second ADB process start
  * - supports --skip-cleanup for legacy reasons with the old implementation
+ * - allow to disable the {@see CheckEnvironment} command being called in the beginning
  *
- * @see CopyTabsCommand
+ * @see LegacyCopyTabsCommand
  */
-class CopyTabsFromAndroid extends Command
+class CopyTabsFromAndroid extends AbstractCopyTabsCommand
 {
+    public const DEFAULT_SOCKET = AndroidDebugBridge::DEFAULT_SOCKET;
+    public const DEFAULT_WAIT   = AndroidDebugBridge::DEFAULT_DELAY;
+
+    protected function configure(): void
+    {
+        parent::configure();
+
+        $definition = $this->getDefinition();
+        // Here we use some black magic to extract a reference to the `$description` property of the InputOption.
+        $argumentPortDescription = & Platform::extractPropertyReference($definition->getOption('port'), 'description');
+        // Next we simply write to that reference - et-voilà.
+        $argumentPortDescription = 'The port to forward requests through `adb`.';
+
+        $this
+            ->setDescription('Transfer tabs from your Android\'s Chrome browser.')
+            ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
+            ->addOption('wait', 'w', InputOption::VALUE_REQUIRED, 'The time to wait before starting the download request (between 0 and 60 seconds).', self::DEFAULT_WAIT)
+            ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution.');
+        ;
+    }
+    /**
+     * @noinspection DuplicatedCode
+     */
+    public function getDriver(Console $console): AbstractDriver
+    {
+        return new AndroidDebugBridge(
+            $this->getArgumentFile($console),
+            $this->getArgumentPort($console),
+            $this->getArgumentDebug($console),
+            $this->getArgumentTimeout($console),
+            $this->getArgumentSocket($console),
+            $this->getArgumentWait($console),
+            $this->getArgumentSkipCleanup($console),
+        );
+    }
+
+    protected function getArgumentSocket(Console $console): string
+    {
+        $argumentSocket = $console->input->getOption('socket');
+
+        if (0 === strlen($argumentSocket)) {
+            $argumentSocket = self::DEFAULT_SOCKET;
+
+            $console->warning("Invalid socket given, default to {$argumentSocket}.");
+        }
+
+        return $argumentSocket;
+    }
+
+    protected function getArgumentWait(Console $console): int
+    {
+        $argumentWait = (int)$console->input->getOption('wait');
+
+        if (0 >= $argumentWait || 60 < $argumentWait) {
+            $argumentWait = self::DEFAULT_WAIT;
+
+            $console->warning("Invalid wait given, default to {$argumentWait}s.");
+        }
+
+        return $argumentWait;
+    }
+
+    protected function getArgumentSkipCleanup(Console $console): bool
+    {
+        return !$console->input->getOption('skip-cleanup');
+    }
 }

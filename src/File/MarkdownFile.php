@@ -25,36 +25,31 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer;
+namespace Machinateur\ChromeTabTransfer\File;
 
-final class Platform
+class MarkdownFile extends AbstractFileTemplate
 {
-    private function __construct()
-    {}
-
-    public static function isWindows(): bool
+    public function getExtension(): string
     {
-        return 0 === \strpos(\PHP_OS, 'WIN');
+        return 'md';
     }
 
-    /**
-     * Extract a reference to a class-private property.
-     *
-     * This is a last-resort approach. Use with care. You have been warned.
-     *
-     * @see https://ocramius.github.io/blog/accessing-private-php-class-members-without-reflection/
-     */
-    public static function & extractPropertyReference(object $object, string $propertyName): mixed
+    public function render(): string
     {
-        $value = & \Closure::bind(function & () use ($propertyName) {
-            return $this->{$propertyName};
-        }, $object, $object)->__invoke();
+        return '# Tabs'
+            . \PHP_EOL
+            . \PHP_EOL
+            . \join(
+                \PHP_EOL, \array_map(static function (array $entry): string {
+                    $url   = $entry['url'];
+                    $title = $entry['title'] ?: $url;
 
-        return $value;
-    }
-
-    public static function isPhar(): bool
-    {
-        return '' !== \Phar::running();
+                    return \sprintf('* [%s](%s)', $title, $url);
+                }, $this->jsonArray)
+            )
+            . \PHP_EOL
+            . \PHP_EOL
+            . 'Created using [machinateur/tab-transfer](https://github.com/machinateur/tab-transfer).'
+            . \PHP_EOL;
     }
 }
