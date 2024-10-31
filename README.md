@@ -1,6 +1,9 @@
 # tab-transfer
 
-A tool to transfer google chrome tabs from your android phone to your computer using `adb`.
+A tool to transfer google chrome tabs from your phone to your computer using developer tools.
+
+This is one of the most reliable ways to transfer larger amounts of opened tabs when switching phones, as it comes with
+ utilities to reopen the exported tabs.
 
 ## Prerequisites
 
@@ -8,7 +11,10 @@ A tool to transfer google chrome tabs from your android phone to your computer u
 * [Composer](https://getcomposer.org/download/)
 * [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
   (platform tools including the `adb` executable)
+* [iOS WebKit Debug Proxy](https://github.com/google/ios-webkit-debug-proxy)
 * [Google Chrome Browser](https://play.google.com/store/apps/details?id=com.android.chrome) on your android phone
+
+TODO: Add iOS docs.
 
 Make sure to add the location of the platform tools to the `PATH` environment variable. Also make sure to activate the
  usb debugging feature under developer options on your android phone and to connect it to your computer. The browser has
@@ -19,6 +25,10 @@ Here's [how to enable USB debugging on your device](https://developer.android.co
 ## Installation
 
 ### *__See [INSTALL.md](INSTALL.md) for a detailed and less technical guide.__*
+
+### Windows installer
+
+TODO
 
 ### Source
 

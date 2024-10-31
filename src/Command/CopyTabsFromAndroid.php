@@ -34,13 +34,9 @@ use Machinateur\ChromeTabTransfer\Shared\Console;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * - uses {@see AndroidDebugBridge} driver
+ * A command implementation to copy tabs using the {@see AndroidDebugBridge} driver.
  *
- * - will support the reopen script as before
- *
- * - lifecycle will require second ADB process start
- * - supports --skip-cleanup for legacy reasons with the old implementation
- * - allow to disable the {@see CheckEnvironment} command being called in the beginning
+ * This command supports the reopen script (`reopen.cmd`/`reopen.sh`) for legacy reasons with android users.
  *
  * @see LegacyCopyTabsCommand
  */
@@ -48,6 +44,11 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
 {
     public const DEFAULT_SOCKET = AndroidDebugBridge::DEFAULT_SOCKET;
     public const DEFAULT_WAIT   = AndroidDebugBridge::DEFAULT_DELAY;
+
+    public function __construct()
+    {
+        parent::__construct('android');
+    }
 
     protected function configure(): void
     {
@@ -63,7 +64,7 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
             ->setDescription('Transfer tabs from your Android\'s Chrome browser.')
             ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
             ->addOption('wait', 'w', InputOption::VALUE_REQUIRED, 'The time to wait before starting the download request (between 0 and 60 seconds).', self::DEFAULT_WAIT)
-            ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution.');
+            ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution. If active, no reopen script will be written.');
         ;
     }
     /**
@@ -80,6 +81,11 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
             $this->getArgumentWait($console),
             $this->getArgumentSkipCleanup($console),
         );
+    }
+
+    public static function checkEnvironment(): bool
+    {
+        return AndroidDebugBridge::checkEnvironment();
     }
 
     protected function getArgumentSocket(Console $console): string

@@ -32,6 +32,9 @@ final class Platform
     private function __construct()
     {}
 
+    /**
+     * Detect whether the application is running on a Windows or Mac/Linux system.
+     */
     public static function isWindows(): bool
     {
         return 0 === \strpos(\PHP_OS, 'WIN');
@@ -53,8 +56,41 @@ final class Platform
         return $value;
     }
 
+    /**
+     * Check whether the application is currently running as `phar` archive.
+     *
+     * @see https://github.com/box-project/box/blob/main/doc/faq.md#detecting-that-you-are-inside-a-phar
+     */
     public static function isPhar(): bool
     {
-        return '' !== \Phar::running();
+        return '' !== \Phar::running(false);
+    }
+
+
+    /**
+     * Check if a given command is available in the shell environment context.
+     *
+     * If there are multiple binary executables available (checked ith `where` on Windows, `command` on Mac/Linux)
+     *  all of them are checked for actual existence and if they're executable.
+     */
+    public static function isShellCommandAvailable(string $shellCommand): bool
+    {
+        $test = self::isWindows()
+            ? 'cmd /c "where %s"'
+            : 'command -v %s';
+
+        return \array_reduce(
+            \explode(PHP_EOL,
+                (string)\shell_exec(
+                    \sprintf($test, $shellCommand)
+                )
+            ),
+            static function (bool $carry, string $entry): bool {
+                $entry = \trim($entry);
+
+                return $carry
+                    || (\is_file($entry) && \is_executable($entry));
+            }, false
+        );
     }
 }

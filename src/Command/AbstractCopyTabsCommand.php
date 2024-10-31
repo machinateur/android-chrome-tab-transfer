@@ -29,6 +29,7 @@ namespace Machinateur\ChromeTabTransfer\Command;
 
 use Machinateur\ChromeTabTransfer\Driver\AbstractDriver;
 use Machinateur\ChromeTabTransfer\Driver\AndroidDebugBridge;
+use Machinateur\ChromeTabTransfer\Driver\DriverEnvironmentCheckInterface;
 use Machinateur\ChromeTabTransfer\Exception\CopyTabsException;
 use Machinateur\ChromeTabTransfer\File\AbstractFileTemplate;
 use Machinateur\ChromeTabTransfer\Service\CopyTabsService;
@@ -40,7 +41,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class AbstractCopyTabsCommand extends Command
+/**
+ * The abstract base class containing common logic for {@see AbstractDriver} driver based commands to copy tabs.
+ */
+abstract class AbstractCopyTabsCommand extends Command implements DriverEnvironmentCheckInterface
 {
     public const DEFAULT_FILE    = 'tabs.json';
     public const DEFAULT_PORT    = AndroidDebugBridge::DEFAULT_PORT;
@@ -50,13 +54,19 @@ abstract class AbstractCopyTabsCommand extends Command
 
     protected readonly CopyTabsService $service;
 
-    public function __construct(string $name)
-    {
+    public function __construct(
+        protected readonly string $driverName,
+    ) {
         $this->date = new \DateTimeImmutable();
 
-        parent::__construct("copy-tabs:{$name}");
+        parent::__construct("copy-tabs:{$driverName}");
 
         $this->service = new CopyTabsService();
+    }
+
+    public function getDriverName(): string
+    {
+        return $this->driverName;
     }
 
     protected function configure(): void
@@ -81,12 +91,13 @@ abstract class AbstractCopyTabsCommand extends Command
             ->get(CheckEnvironment::NAME);
 
         if ( ! $command instanceof CheckEnvironment) {
-            throw new \LogicException(\sprintf('The application must contain the %s command.', $console));
+            throw new \LogicException(\sprintf('The application must contain the %s command.', $command->getName()));
         }
 
         return $command->execute(new ArrayInput([
-            // TODO: Set options if necessary.
-        ]), $console);
+            // Setting the driver name is optional if a `$command` is directly passed as third argument.
+            'driver' => $this->driverName,
+        ]), $console, $this);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -146,6 +157,8 @@ abstract class AbstractCopyTabsCommand extends Command
     }
 
     abstract public function getDriver(Console $console): AbstractDriver;
+
+    abstract public static function checkEnvironment(): bool;
 
     protected function getArgumentFile(Console $console): string
     {

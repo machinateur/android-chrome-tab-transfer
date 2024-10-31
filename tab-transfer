@@ -47,8 +47,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 $isCompatibilityMode = true == $_SERVER['COMPATIBILITY_MODE'] ?? $_ENV['COMPATIBILITY_MODE'] ?? false;
-// TODO: Remove next line.
-$isCompatibilityMode = true;
+$isCompatibilityMode = true; // TODO: Remove this line.
 
 $commands = [
     new CheckEnvironment(),

@@ -34,17 +34,23 @@ use Machinateur\ChromeTabTransfer\Shared\Console;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * - uses {@see IosWebkitDebugProxy} driver
+ * A command implementation to copy tabs using the {@see IosWebkitDebugProxy} driver.
  *
- * - will not support reopen script (for now, until I find a way to open tabs on iOS)
- *   maybe using https://github.com/sirn-se/websocket-php will be an option to control the websocket command directly
- *     - The main issue here is that a script will not be possible then. the reopen.cmd/reopen.sh is only supported for legacy reasons with android users.
+ * This command does not support the reopen script (for now, until I find a way to open tabs on iOS).
+ *  Maybe it's possible to use https://github.com/sirn-se/websocket-php to directly control the websocket.
+ * The main issue here is that a bash/cmd script will not be possible then. Therefor the {@see ReopenTabs} command
+ *  should be used. The `reopen.cmd`/`reopen.sh` is only supported for legacy reasons with android users.
  *
  * @see https://github.com/google/ios-webkit-debug-proxy
  */
 class CopyTabsFromIphone extends AbstractCopyTabsCommand
 {
     public const DEFAULT_WAIT = IosWebkitDebugProxy::DEFAULT_DELAY;
+
+    public function __construct()
+    {
+        parent::__construct('iphone');
+    }
 
     protected function configure(): void
     {
@@ -62,9 +68,6 @@ class CopyTabsFromIphone extends AbstractCopyTabsCommand
         ;
     }
 
-    /**
-     * @noinspection DuplicatedCode
-     */
     public function getDriver(Console $console): AbstractDriver
     {
         return new IosWebkitDebugProxy(
@@ -74,6 +77,14 @@ class CopyTabsFromIphone extends AbstractCopyTabsCommand
             $this->getArgumentTimeout($console),
             $this->getArgumentWait($console),
         );
+    }
+
+    /**
+     * @noinspection DuplicatedCode
+     */
+    public static function checkEnvironment(): bool
+    {
+        return IosWebkitDebugProxy::checkEnvironment();
     }
 
     protected function getArgumentWait(Console $console): int

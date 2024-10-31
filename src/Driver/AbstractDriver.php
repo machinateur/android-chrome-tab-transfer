@@ -30,6 +30,7 @@ namespace Machinateur\ChromeTabTransfer\Driver;
 use Machinateur\ChromeTabTransfer\File\FileTemplateInterface;
 use Machinateur\ChromeTabTransfer\File\JsonFile;
 use Machinateur\ChromeTabTransfer\File\MarkdownFile;
+use Machinateur\ChromeTabTransfer\Platform;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Machinateur\ChromeTabTransfer\Shared\ConsoleTrait;
 use Machinateur\ChromeTabTransfer\Shared\FileDateTrait;
@@ -44,7 +45,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @method AbstractDriver setOutput(OutputInterface $output)
  * @method AbstractDriver setFileDate(?\DateTimeInterface $date)
  */
-abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInterface
+abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInterface, DriverEnvironmentCheckInterface
 {
     use ConsoleTrait {
         __construct as private initializeConsole;
@@ -86,5 +87,10 @@ abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInte
             new JsonFile($this->file, $jsonArray),
             new MarkdownFile($this->file, $jsonArray),
         ];
+    }
+
+    public static function checkEnvironment(): bool
+    {
+        return Platform::isShellCommandAvailable('adb');
     }
 }
