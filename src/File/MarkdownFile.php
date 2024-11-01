@@ -29,6 +29,13 @@ namespace Machinateur\ChromeTabTransfer\File;
 
 class MarkdownFile extends AbstractFileTemplate
 {
+    public function __construct(string $file, array $jsonArray)
+    {
+        parent::__construct($file, $jsonArray);
+
+        $this->filenameSuffix = '-gist';
+    }
+
     public function getExtension(): string
     {
         return 'md';

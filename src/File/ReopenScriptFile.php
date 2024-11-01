@@ -38,6 +38,8 @@ class ReopenScriptFile extends AbstractFileTemplate
         private readonly string $socket,
     ) {
         parent::__construct($file, $jsonArray);
+
+        $this->filenameSuffix = '-reopen';
     }
 
     public function getExtension(): string

@@ -133,7 +133,7 @@ abstract class AbstractCopyTabsCommand extends Command
             $console->note('No tabs were copied from the device.');
         }
 
-        $console->success(\sprintf('Successfully copied %d tabs from the device.', ));
+        $console->success("Successfully copied {$numberOfTabsTransferred} tabs from the device.");
         $console->newLine();
 
         // With `-vvv` parameter, print the fetched tabs to stdout. Only if there were tabs downloaded, else skip this step.

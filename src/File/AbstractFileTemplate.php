@@ -49,6 +49,8 @@ abstract class AbstractFileTemplate implements FileTemplateInterface
 
     public const DATE_FORMAT = 'Y-m-d';
 
+    protected string $filenameSuffix = '';
+
     public function __construct(
         protected readonly string $file,
         protected readonly array  $jsonArray,
@@ -64,8 +66,7 @@ abstract class AbstractFileTemplate implements FileTemplateInterface
         if ($this->date) {
             $file = "{$file}_{$this->date->format(self::DATE_FORMAT)}";
         }
-
-        $file = "{$file}.{$this->getExtension()}";
+        $file = "{$file}{$this->filenameSuffix}.{$this->getExtension()}";
 
         return Path::join($dir, $file);
     }

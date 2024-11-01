@@ -127,6 +127,6 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
 
     protected function getArgumentSkipCleanup(Console $console): bool
     {
-        return !$console->input->getOption('skip-cleanup');
+        return $console->input->getOption('skip-cleanup');
     }
 }
