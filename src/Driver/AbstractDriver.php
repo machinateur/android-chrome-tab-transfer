@@ -89,8 +89,5 @@ abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInte
         ];
     }
 
-    public static function checkEnvironment(): bool
-    {
-        return Platform::isShellCommandAvailable('adb');
-    }
+    abstract public static function checkEnvironment(): bool;
 }

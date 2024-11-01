@@ -28,6 +28,7 @@ declare(strict_types=1);
 namespace Machinateur\ChromeTabTransfer\Driver;
 
 use Machinateur\ChromeTabTransfer\File\ReopenScriptFile;
+use Machinateur\ChromeTabTransfer\Platform;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Machinateur\ChromeTabTransfer\TabLoader\CurlTabLoader;
 use Machinateur\ChromeTabTransfer\TabLoader\TabLoaderInterface;
@@ -201,5 +202,10 @@ final class AndroidDebugBridge extends AbstractDriver
         }
 
         return $fileTemplates;
+    }
+
+    public static function checkEnvironment(): bool
+    {
+        return Platform::isShellCommandAvailable('adb');
     }
 }

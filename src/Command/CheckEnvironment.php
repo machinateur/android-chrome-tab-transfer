@@ -49,57 +49,81 @@ class CheckEnvironment extends Command
     protected function execute(InputInterface $input, OutputInterface $output, ?AbstractCopyTabsCommand $command = null): int
     {
         $console    = new Console($input, $output);
-        $driverName = $this->getArgumentDriver($console);
 
-        if ( ! $command) {
-            // TODO: Make sure to not check the application of we get an instance directly as argument.
+        // When no `$command` is provided with the call (i.e. direct invocation via CLI).
+        if ( ! $command instanceof AbstractCopyTabsCommand) {
+            $driverName = $this->getArgumentDriver($console);
+
+            // Only check the specified driver, if the `--driver` (`-i`) option was specified.
+            if (null !== $driverName) {
+                $command = $this->findCommand($console, $driverName);
+            }
         }
 
-        if (null === $command) {
-
+        if ($command instanceof AbstractCopyTabsCommand) {
+            return $this->check($console, $command)
+                ? Command::SUCCESS
+                : Command::FAILURE;
         }
 
-        // Load all the available commands inside the `copy-tabs` namespace.
-        $commands = $this->getApplication()
-            ->all('copy-tabs');
+        $result = true;
 
-        if (null !== $driverName) {
-            // Only check the specified driver.
-            $command = \array_reduce($commands, static function (?Command $carry, Command $command) use ($driverName) {
-                if ( ! $command instanceof AbstractCopyTabsCommand) {
-                    return $carry;
-                }
+        // Perform checks on all of them, if no single one is specified (default).
+        foreach ($this->getCommands() as $command) {
+            if ( ! $command instanceof AbstractCopyTabsCommand) {
+                continue;
+            }
 
-                if (null === $carry && $command->getDriverName() === $driverName) {
-                    return $command;
-                }
+            $result = $result && $this->check($console, $command);
+        }
 
+        return $result
+            ? Command::SUCCESS
+            : Command::FAILURE;
+    }
+
+    protected function check(Console $console, AbstractCopyTabsCommand $command): bool
+    {
+        // TODO: Add verbose output.
+        return $command->checkCommandEnvironment($console);
+    }
+
+    protected function findCommand(Console $console, string $driverName): ?AbstractCopyTabsCommand
+    {
+        // TODO: Add console output.
+
+        $command = \array_reduce($this->getCommands(), static function (?Command $carry, Command $command) use ($driverName) {
+            if ( ! $command instanceof AbstractCopyTabsCommand) {
                 return $carry;
-            });
-
-            if ( ! $command instanceof DriverEnvironmentCheckInterface) {
-                if (null === $command) {
-                    // TODO: Not found error.
-                }
-
-                // TODO: No check possible error.
             }
 
-            // TODO: Add verbose output.
-            $command::checkEnvironment();
-        } else {
-            // Perform checks on all of them.
-            foreach ($commands as $command) {
-                // TODO: Add verbose output.
-                if ( ! $command instanceof AbstractCopyTabsCommand) {
-                    continue;
-                }
-
-                $command::checkEnvironment();
+            if (null === $carry && $command->getDriverName() === $driverName) {
+                return $command;
             }
+
+            return $carry;
+        });
+
+        if ( ! $command instanceof DriverEnvironmentCheckInterface) {
+            if (null === $command) {
+                // TODO: Not found error.
+            }
+
+            // TODO: No check possible error.
         }
 
-        return Command::SUCCESS;
+        return $command;
+    }
+
+    /**
+     * Load all the available commands inside the `copy-tabs` namespace from the application.
+     *
+     * @return array<Command>
+     */
+    private function getCommands(string $namespace = 'copy-tabs'): array
+    {
+        return $this->getApplication()
+            ->all('copy-tabs');
     }
 
     protected function getArgumentDriver(Console $console): ?string

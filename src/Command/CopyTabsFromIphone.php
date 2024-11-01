@@ -79,11 +79,9 @@ class CopyTabsFromIphone extends AbstractCopyTabsCommand
         );
     }
 
-    /**
-     * @noinspection DuplicatedCode
-     */
-    public static function checkEnvironment(): bool
+    public function checkCommandEnvironment(Console $console): bool
     {
+        // TODO: Add debug output.
         return IosWebkitDebugProxy::checkEnvironment();
     }
 

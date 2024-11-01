@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Driver;
 
+use Machinateur\ChromeTabTransfer\Platform;
 use Symfony\Component\Process\Process;
 
 /**
@@ -153,5 +154,10 @@ final class IosWebkitDebugProxy extends AbstractDriver
     public function getUrl(): string
     {
         return "http://localhost:{$this->port}/json";
+    }
+
+    public static function checkEnvironment(): bool
+    {
+        return Platform::isShellCommandAvailable('ios_webkit_debug_proxy');
     }
 }

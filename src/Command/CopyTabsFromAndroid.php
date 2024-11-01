@@ -67,9 +67,7 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
             ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution. If active, no reopen script will be written.');
         ;
     }
-    /**
-     * @noinspection DuplicatedCode
-     */
+
     public function getDriver(Console $console): AbstractDriver
     {
         return new AndroidDebugBridge(
@@ -83,8 +81,9 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
         );
     }
 
-    public static function checkEnvironment(): bool
+    public function checkCommandEnvironment(Console $console): bool
     {
+        // TODO: Add debug output.
         return AndroidDebugBridge::checkEnvironment();
     }
 

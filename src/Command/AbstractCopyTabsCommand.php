@@ -44,7 +44,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The abstract base class containing common logic for {@see AbstractDriver} driver based commands to copy tabs.
  */
-abstract class AbstractCopyTabsCommand extends Command implements DriverEnvironmentCheckInterface
+abstract class AbstractCopyTabsCommand extends Command
 {
     public const DEFAULT_FILE    = 'tabs.json';
     public const DEFAULT_PORT    = AndroidDebugBridge::DEFAULT_PORT;
@@ -158,7 +158,16 @@ abstract class AbstractCopyTabsCommand extends Command implements DriverEnvironm
 
     abstract public function getDriver(Console $console): AbstractDriver;
 
-    abstract public static function checkEnvironment(): bool;
+    /**
+     * This method should encapsulate the environment requirements for the specific command.
+     *
+     * Usually this simply calls through to the {@see DriverEnvironmentCheckInterface::checkEnvironment()} with some
+     *  additional debug output to the provided `$console`.
+     *
+     * It is not meant to be called directly from within this same class, but from {@see CheckEnvironment}, which will
+     *  add important contextual output to the provided `$console`.
+     */
+    abstract public function checkCommandEnvironment(Console $console): bool;
 
     protected function getArgumentFile(Console $console): string
     {
