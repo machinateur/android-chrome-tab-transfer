@@ -33,16 +33,16 @@ class FileTemplateDumpException extends \Exception
 {
     public static function forExistingFile(string $filename): self
     {
-        return new self('Failed to write file template! File already exists: '. $filename);
+        return new self("Failed to write file template! File already exists: {$filename}.");
     }
 
     public static function forEmptyFileContent(string $filename): self
     {
-        return new self('Failed to write file template! Empty content for file:' . $filename);
+        return new self("Failed to write file template! Empty content for file: {$filename}.");
     }
 
     public static function fromIOException(IOException $exception): self
     {
-        return new self('Failed to write file template! Filesystem IO error: ' . $exception->getMessage());
+        return new self("Failed to write file template! Filesystem IO error: {$exception->getMessage()}");
     }
 }

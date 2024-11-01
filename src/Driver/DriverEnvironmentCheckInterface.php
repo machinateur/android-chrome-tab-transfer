@@ -29,5 +29,5 @@ namespace Machinateur\ChromeTabTransfer\Driver;
 
 interface DriverEnvironmentCheckInterface
 {
-    public static function checkEnvironment(): bool;
+    public function checkEnvironment(): bool;
 }

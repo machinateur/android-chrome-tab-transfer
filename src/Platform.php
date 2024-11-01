@@ -93,4 +93,9 @@ final class Platform
             }, false
         );
     }
+
+    public static function isExecutable(string $filename): bool
+    {
+        return \is_executable($filename);
+    }
 }

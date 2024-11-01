@@ -81,7 +81,7 @@ abstract class AbstractCopyTabsCommand extends Command
     }
 
     /**
-     * Call the {@see CheckEnvironment} command internally.
+     * Call the {@see checkCommandEnvironment} command internally.
      *
      * @return int{0,2}
      */
@@ -164,10 +164,20 @@ abstract class AbstractCopyTabsCommand extends Command
      * Usually this simply calls through to the {@see DriverEnvironmentCheckInterface::checkEnvironment()} with some
      *  additional debug output to the provided `$console`.
      *
-     * It is not meant to be called directly from within this same class, but from {@see CheckEnvironment}, which will
+     * It is not meant to be called directly from within this same class, but from {@see checkCommandEnvironment}, which will
      *  add important contextual output to the provided `$console`.
      */
     abstract public function checkCommandEnvironment(Console $console): bool;
+
+    protected function getDefaultConsole(Console $console, array $parameters = []): Console
+    {
+        $parameters = [
+            'command' => $this->getName(),
+            'file'    => self::DEFAULT_FILE,
+        ];
+
+        return new Console(new ArrayInput($parameters, $this->getDefinition()), $console->output);
+    }
 
     protected function getArgumentFile(Console $console): string
     {

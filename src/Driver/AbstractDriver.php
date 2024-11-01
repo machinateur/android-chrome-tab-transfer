@@ -89,5 +89,25 @@ abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInte
         ];
     }
 
-    abstract public static function checkEnvironment(): bool;
+
+    public function checkEnvironment(): bool
+    {
+        $shellCommand = $this->getShellCommand();
+
+        $console = $this->getConsole();
+        $console->writeln("Checking for availability of `$shellCommand`.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+        $commandAvailable = Platform::isShellCommandAvailable($shellCommand);
+
+        // TODO: Support local path installation relative (in tools/).
+        if ($commandAvailable) {
+            $console->writeln("The `$shellCommand` executable is available.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        } else {
+            $console->writeln("The `$shellCommand` executable was not found!", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        }
+
+        return $commandAvailable;
+    }
+
+    abstract protected function getShellCommand(): string;
 }

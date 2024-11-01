@@ -27,9 +27,9 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Command;
 
-use Machinateur\ChromeTabTransfer\Driver\DriverEnvironmentCheckInterface;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -54,65 +54,73 @@ class CheckEnvironment extends Command
         if ( ! $command instanceof AbstractCopyTabsCommand) {
             $driverName = $this->getArgumentDriver($console);
 
+            $console->writeln("No command provided.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
             // Only check the specified driver, if the `--driver` (`-i`) option was specified.
             if (null !== $driverName) {
+                $console->writeln("Driver name specified: {$driverName}.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
                 $command = $this->findCommand($console, $driverName);
             }
         }
 
         if ($command instanceof AbstractCopyTabsCommand) {
-            return $this->check($console, $command)
-                ? Command::SUCCESS
-                : Command::FAILURE;
-        }
+            $result = $this->check($console, $command);
+        } else {
+            $console->writeln('Falling back to checking all available drivers...', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        $result = true;
+            $result = true;
 
-        // Perform checks on all of them, if no single one is specified (default).
-        foreach ($this->getCommands() as $command) {
-            if ( ! $command instanceof AbstractCopyTabsCommand) {
-                continue;
+            // Perform checks on all of them, if no single one is specified (default).
+            foreach ($this->getCommands() as $command) {
+                if ( ! $command instanceof AbstractCopyTabsCommand) {
+                    continue;
+                }
+
+                $result = $result && $this->check($console, $command);
             }
-
-            $result = $result && $this->check($console, $command);
         }
 
-        return $result
-            ? Command::SUCCESS
-            : Command::FAILURE;
+        if (!$result) {
+            $console->error('Environment check failed!');
+            return Command::FAILURE;
+        }
+
+        $console->success('Environment check successful!');
+        return Command::SUCCESS;
     }
 
     protected function check(Console $console, AbstractCopyTabsCommand $command): bool
     {
-        // TODO: Add verbose output.
         return $command->checkCommandEnvironment($console);
     }
 
     protected function findCommand(Console $console, string $driverName): ?AbstractCopyTabsCommand
     {
-        // TODO: Add console output.
+        $console->writeln("Searching for command with driver `{$driverName}`.", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        $command = \array_reduce($this->getCommands(), static function (?Command $carry, Command $command) use ($driverName) {
+        try {
+            $command = $this->getApplication()
+                ->find($commandName = "copy-tabs:{$driverName}");
+
             if ( ! $command instanceof AbstractCopyTabsCommand) {
-                return $carry;
+                $console->writeln(\sprintf("Found command `{$commandName}` but not not compatible with interface (driver was `{$driverName}`)."), OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+                return null;
             }
 
-            if (null === $carry && $command->getDriverName() === $driverName) {
-                return $command;
+            $console->writeln("Found command `{$command->getName()}` for driver `{$driverName}`.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            return $command;
+        } catch (CommandNotFoundException $exception) {
+            if ($alternatives = $exception->getAlternatives()) {
+                $console->writeln(\sprintf("No command `{$commandName}` found for driver `{$driverName}`: %s", \implode('`, `', $alternatives)), OutputInterface::VERBOSITY_VERY_VERBOSE);
+            } else {
+                $console->writeln("No command `{$commandName}` found for driver `{$driverName}.`", OutputInterface::VERBOSITY_VERY_VERBOSE);
             }
-
-            return $carry;
-        });
-
-        if ( ! $command instanceof DriverEnvironmentCheckInterface) {
-            if (null === $command) {
-                // TODO: Not found error.
-            }
-
-            // TODO: No check possible error.
         }
 
-        return $command;
+        return null;
     }
 
     /**

@@ -28,10 +28,7 @@ declare(strict_types=1);
 namespace Machinateur\ChromeTabTransfer\Driver;
 
 use Machinateur\ChromeTabTransfer\File\ReopenScriptFile;
-use Machinateur\ChromeTabTransfer\Platform;
 use Machinateur\ChromeTabTransfer\Shared\Console;
-use Machinateur\ChromeTabTransfer\TabLoader\CurlTabLoader;
-use Machinateur\ChromeTabTransfer\TabLoader\TabLoaderInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -135,51 +132,58 @@ final class AndroidDebugBridge extends AbstractDriver
         parent::__construct($file, $port, $debug, $timeout);
     }
 
-    private function run(Process $process, Console $console): void
+    protected function run(Process $process, Console $console): void
     {
-        $console->progressStart(10);
-
+        $console->progressStart(1);
         $process->start();
         $process->wait();
+        $console->progressFinish();
 
         if ($this->debug) {
-            $console->newLine();
-            $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode(\PHP_EOL, $process->getOutput())));
+            $combinedProcessOutput = \array_filter(
+                \array_map(
+                    static fn(string $line): string => "< {$line}",
+                    \array_merge(
+                        \explode(\PHP_EOL, $process->getOutput()),
+                        \explode(\PHP_EOL, $process->getErrorOutput()),
+                    )
+                )
+            );
+
+            $console->writeln($combinedProcessOutput);
             $console->newLine();
         }
+
         $console->writeln("Waiting for {$this->delay} seconds...", OutputInterface::VERBOSITY_VERY_VERBOSE);
-
         \sleep($this->delay);
-
-        $console->progressFinish();
     }
 
     public function start(): void
     {
         $console = $this->getConsole();
-        $console->writeln(__METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
+        $console->writeln(' ==> ' . __METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
 
         $console->comment('Running `adb` command...');
-        $console->writeln("> adb -d forward tcp:{$this->port} localabstract:{$this->socket}", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $console->writeln("> adb -d forward tcp:{$this->port} localabstract:{$this->socket}", OutputInterface::VERBOSITY_DEBUG);
         $this->run(
             new Process(['adb', '-d', 'forward', "tcp:{$this->port}", "localabstract:{$this->socket}"]), console: $console
         );
 
-        $console->writeln(__METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
+        $console->writeln(' ==> ' . __METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
     }
 
     public function stop(): void
     {
         $console = $this->getConsole();
-        $console->writeln(__METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
+        $console->writeln(' ==> ' . __METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
 
         $console->comment('Running `adb` cleanup command...');
-        $console->writeln("> adb -d forward --remove tcp:{$this->port}", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $console->writeln("> adb -d forward --remove tcp:{$this->port}", OutputInterface::VERBOSITY_DEBUG);
         $this->run(
             new Process(['adb', '-d', 'forward', '--remove', "tcp:{$this->port}"]), console: $console
         );
 
-        $console->writeln(__METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
+        $console->writeln(' ==> ' . __METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
     }
 
     public function getUrl(): string
@@ -204,8 +208,8 @@ final class AndroidDebugBridge extends AbstractDriver
         return $fileTemplates;
     }
 
-    public static function checkEnvironment(): bool
+    protected function getShellCommand(): string
     {
-        return Platform::isShellCommandAvailable('adb');
+        return 'adb';
     }
 }

@@ -34,6 +34,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 trait ConsoleTrait
 {
+    protected ?Console $console = null;
+
     protected OutputInterface $output;
     protected InputInterface  $input;
 
@@ -50,7 +52,8 @@ trait ConsoleTrait
 
     public function setOutput(OutputInterface $output): static
     {
-        $this->output = $output;
+        $this->console = null;
+        $this->output  = $output;
         return $this;
     }
 
@@ -61,19 +64,21 @@ trait ConsoleTrait
 
     public function setInput(InputInterface $input): static
     {
-        $this->input = $input;
+        $this->console = null;
+        $this->input   = $input;
         return $this;
     }
 
     public function getConsole(): Console
     {
-        return new Console($this->input, $this->output);
+        return $this->console ??= new Console($this->input, $this->output);
     }
 
     public function setConsole(Console $console): static
     {
-        $this->input  = $console->input;
-        $this->output = $console->output;
+        $this->console = $console;
+        $this->input   = $console->input;
+        $this->output  = $console->output;
         return $this;
     }
 }

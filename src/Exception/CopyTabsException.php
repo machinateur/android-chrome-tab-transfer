@@ -31,20 +31,16 @@ class CopyTabsException extends \Exception
 {
     public static function fromTabLoadingFailedException(TabLoadingFailedException $exception): self
     {
-        // TODO: Check $exception contents to refine message directly in here, instead of in the command code.
-
-        return new self('Failed to copy tabs from device!', previous: $exception);
+        return new self("Failed to copy tabs from device! {$exception->getMessage()}", previous: $exception);
     }
 
     public static function forEmptyResult(string $url): self
     {
-        // TODO: Use $url in error message.
-
-        return new self('Failed to copy tabs from device! Empty result.');
+        return new self("Failed to copy tabs from device! Empty result from URL `{$url}`.");
     }
 
     public static function fromFileTemplateDumpException(FileTemplateDumpException $exception): self
     {
-        return new self('Failed to copy tabs from device! ' . $exception->getMessage(), previous: $exception);
+        return new self("Failed to copy tabs from device! {$exception->getMessage()}", previous: $exception);
     }
 }

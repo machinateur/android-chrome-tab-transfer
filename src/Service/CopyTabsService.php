@@ -56,10 +56,13 @@ class CopyTabsService
             $tabs = $driver->getTabLoader()
                 ->load();
         } catch (TabLoadingFailedException $exception) {
-            throw CopyTabsException::fromTabLoadingFailedException($exception);
         }
 
         $driver->stop();
+
+        if (isset($exception)) {
+            throw CopyTabsException::fromTabLoadingFailedException($exception);
+        }
 
         if (empty($tabs)) {
             throw CopyTabsException::forEmptyResult($driver->getUrl());
@@ -92,7 +95,8 @@ class CopyTabsService
 
             $filename = $fileTemplate->getFilename();
 
-            $console->writeln("-> From {$fileTemplate::class} to file {$filename}.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $fileTemplateClass = $fileTemplate::class;
+            $console->writeln("-> From {$fileTemplateClass} to file {$filename}.", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             if ($this->filesystem->exists($filename)) {
                 $replace = $console->confirm("The file `{$filename}` already exists. Do you wish to overwrite it?");
@@ -149,7 +153,7 @@ class CopyTabsService
             try {
                 $this->filesystem->dumpFile($filename, $content);
             } catch (IOException $exception) {
-                $console->writeln('Error writing file: ' . $exception->getMessage(), OutputInterface::VERBOSITY_DEBUG);
+                $console->writeln('Error writing file: ' . $exception->getMessage(), OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 if ($driver->debug) {
                     // Don't throw inside the loop, and never after download process was finished.

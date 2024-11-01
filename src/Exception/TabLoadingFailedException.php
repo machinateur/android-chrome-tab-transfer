@@ -31,11 +31,11 @@ class TabLoadingFailedException extends \Exception
 {
     public static function withoutErrorMessage(int $errorCode): self
     {
-        return new self(\sprintf('Failed curl request with error %d', $errorCode));
+        return new self("Failed curl request with error {$errorCode}.");
     }
 
-    public static function fromJsonException(\JsonException $exception)
+    public static function fromJsonException(\JsonException $exception): self
     {
-        return new self('Failed decoding json response with error: ' . $exception->getMessage(), previous: $exception);
+        return new self("Failed decoding json response with error: {$exception->getMessage()}.", previous: $exception);
     }
 }

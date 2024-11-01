@@ -46,8 +46,7 @@ use Machinateur\ChromeTabTransfer\Command\CopyTabsFromIphone;
 use Symfony\Component\Console\Application;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-$isCompatibilityMode = true == $_SERVER['COMPATIBILITY_MODE'] ?? $_ENV['COMPATIBILITY_MODE'] ?? false;
-$isCompatibilityMode = true; // TODO: Remove this line.
+$isCompatibilityMode = true == ($_SERVER['COMPATIBILITY_MODE'] ?? $_ENV['COMPATIBILITY_MODE'] ?? false);
 
 $commands = [
     new CheckEnvironment(),

@@ -27,7 +27,7 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Driver;
 
-use Machinateur\ChromeTabTransfer\Platform;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -138,17 +138,52 @@ final class IosWebkitDebugProxy extends AbstractDriver
 
     public function start(): void
     {
-        $this->process->start();
-        //$this->process->waitUntil();
+        $console = $this->getConsole();
+        $console->writeln(' ==> ' . __METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
 
+        $console->comment('Starting `ios_webkit_debug_proxy` background process...');
+
+        $console->progressStart(1);
+        $this->process->start();
+        $console->progressFinish();
+
+        $console->writeln("Waiting for {$this->delay} seconds...", OutputInterface::VERBOSITY_VERY_VERBOSE);
         \sleep($this->delay);
+
+        $console->writeln(' ==> ' . __METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
     }
 
     public function stop(): void
     {
-        $this->process->stop();
+        $console = $this->getConsole();
+        $console->writeln(' ==> ' . __METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
 
+        $console->comment('Stopping `ios_webkit_debug_proxy` background process...');
+
+        $console->progressStart(1);
+        $this->process->stop();
+        $this->process->wait();
+        $console->progressFinish();
+
+        if ($this->debug) {
+            $combinedProcessOutput = \array_filter(
+                \array_map(
+                    static fn(string $line): string => "< {$line}",
+                    \array_merge(
+                        \explode(\PHP_EOL, $this->process->getOutput()),
+                        \explode(\PHP_EOL, $this->process->getErrorOutput()),
+                    )
+                )
+            );
+
+            $console->writeln($combinedProcessOutput);
+            $console->newLine();
+        }
+
+        $console->writeln("Waiting for {$this->delay} seconds...", OutputInterface::VERBOSITY_VERY_VERBOSE);
         \sleep($this->delay);
+
+        $console->writeln(' ==> ' . __METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
     }
 
     public function getUrl(): string
@@ -156,8 +191,8 @@ final class IosWebkitDebugProxy extends AbstractDriver
         return "http://localhost:{$this->port}/json";
     }
 
-    public static function checkEnvironment(): bool
+    protected function getShellCommand(): string
     {
-        return Platform::isShellCommandAvailable('ios_webkit_debug_proxy');
+        return 'ios_webkit_debug_proxy';
     }
 }

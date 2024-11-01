@@ -100,7 +100,7 @@ class LegacyCopyTabsCommand extends Command implements EventSubscriberInterface
     protected function configure(): void
     {
         $this
-            ->setDescription('A tool to transfer tabs from your android phone to your computer using `adb`.')
+            ->setDescription('A tool to transfer tabs from your android phone to your computer using `adb`. [<info>Legacy</info>]')
             ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write. Only the filename is actually considered!', self::DEFAULT_FILE)
             ->addOption('date', 'd', InputOption::VALUE_NEGATABLE, "Whether to add the date `{$this->date}` suffix to the filename. Active by Default.", true)
             ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests using `adb`.', self::DEFAULT_PORT)

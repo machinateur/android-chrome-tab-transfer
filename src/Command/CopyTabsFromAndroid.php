@@ -32,6 +32,7 @@ use Machinateur\ChromeTabTransfer\Driver\AndroidDebugBridge;
 use Machinateur\ChromeTabTransfer\Platform;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * A command implementation to copy tabs using the {@see AndroidDebugBridge} driver.
@@ -68,9 +69,17 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
         ;
     }
 
+    private ?AndroidDebugBridge $driver = null;
+
     public function getDriver(Console $console): AbstractDriver
     {
-        return new AndroidDebugBridge(
+        if ($this->driver) {
+            $console->writeln("Loading {$this->driverName} driver...", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        } else {
+            $console->writeln("Creating {$this->driverName} driver...", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        }
+
+        return $this->driver ??= new AndroidDebugBridge(
             $this->getArgumentFile($console),
             $this->getArgumentPort($console),
             $this->getArgumentDebug($console),
@@ -83,8 +92,11 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
 
     public function checkCommandEnvironment(Console $console): bool
     {
-        // TODO: Add debug output.
-        return AndroidDebugBridge::checkEnvironment();
+        $console->writeln("Checking environment for {$this->driverName} ({$this->getName()})...", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+        return $this->getDriver($this->getDefaultConsole($console))
+            ->setConsole($console)
+            ->checkEnvironment();
     }
 
     protected function getArgumentSocket(Console $console): string
