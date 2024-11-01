@@ -177,11 +177,18 @@ final class AndroidDebugBridge extends AbstractDriver
         $console = $this->getConsole();
         $console->writeln(' ==> ' . __METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
 
-        $console->comment('Running `adb` cleanup command...');
-        $console->writeln("> adb -d forward --remove tcp:{$this->port}", OutputInterface::VERBOSITY_DEBUG);
-        $this->run(
-            new Process(['adb', '-d', 'forward', '--remove', "tcp:{$this->port}"]), console: $console
-        );
+        if ($this->skipCleanup) {
+            $console->writeln([
+                '<fg=black;bg=yellow>Skipping adb cleanup command... To dispose manually, run:</>',
+                "<fg=black;bg=yellow;options=bold,underscore>> `adb -d forward --remove tcp:{$this->port}`</>",
+            ]);
+        } else {
+            $console->comment('Running `adb` cleanup command...');
+            $console->writeln("> adb -d forward --remove tcp:{$this->port}", OutputInterface::VERBOSITY_DEBUG);
+            $this->run(
+                new Process(['adb', '-d', 'forward', '--remove', "tcp:{$this->port}"]), console: $console
+            );
+        }
 
         $console->writeln(' ==> ' . __METHOD__ . ': Done.', OutputInterface::VERBOSITY_DEBUG);
     }
