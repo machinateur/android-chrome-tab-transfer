@@ -35,6 +35,7 @@ use Machinateur\ChromeTabTransfer\File\AbstractFileTemplate;
 use Machinateur\ChromeTabTransfer\Service\CopyTabsService;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -171,17 +172,21 @@ abstract class AbstractCopyTabsCommand extends Command
 
     protected function getDefaultConsole(Console $console, array $parameters = []): Console
     {
-        $parameters = [
+        $input = new ArrayInput($parameters + [
             'command' => $this->getName(),
             'file'    => self::DEFAULT_FILE,
-        ];
+        ], $this->getDefinition());
 
-        return new Console(new ArrayInput($parameters, $this->getDefinition()), $console->output);
+        return new Console($input, $console->output);
     }
 
     protected function getArgumentFile(Console $console): string
     {
-        return $console->input->getArgument('file');
+        try {
+            return $console->input->getArgument('file');
+        } catch (InvalidArgumentException) {
+            return self::DEFAULT_FILE;
+        }
     }
 
     protected function getArgumentDate(Console $console): ?\DateTimeInterface

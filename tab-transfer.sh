@@ -44,5 +44,5 @@ else
     echo composer.phar install
   fi
 
-  php tab-transfer.php "$@"
+  php tab-transfer "$@"
 fi

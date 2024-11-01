@@ -75,6 +75,8 @@ class CopyTabsFromIphone extends AbstractCopyTabsCommand
     {
         if ($this->driver) {
             $console->writeln("Loading {$this->driverName} driver...", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            $this->driver = null;
         } else {
             $console->writeln("Creating {$this->driverName} driver...", OutputInterface::VERBOSITY_VERY_VERBOSE);
         }

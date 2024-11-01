@@ -75,6 +75,8 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
     {
         if ($this->driver) {
             $console->writeln("Loading {$this->driverName} driver...", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            $this->driver = null;
         } else {
             $console->writeln("Creating {$this->driverName} driver...", OutputInterface::VERBOSITY_VERY_VERBOSE);
         }
@@ -127,6 +129,6 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
 
     protected function getArgumentSkipCleanup(Console $console): bool
     {
-        return $console->input->getOption('skip-cleanup');
+        return (bool)$console->input->getOption('skip-cleanup');
     }
 }

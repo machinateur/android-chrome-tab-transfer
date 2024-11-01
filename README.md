@@ -9,6 +9,7 @@ This is one of the most reliable ways to transfer larger amounts of opened tabs 
 
 * [PHP 8.1 or newer](https://www.php.net/downloads.php)
 * [Composer](https://getcomposer.org/download/)
+  (optional)
 * [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
   (platform tools including the `adb` executable)
 * [iOS WebKit Debug Proxy](https://github.com/google/ios-webkit-debug-proxy)

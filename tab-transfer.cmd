@@ -45,5 +45,5 @@ if exist tab-transfer.phar (
     php composer.phar install
   )
 
-  php tab-transfer.php %*
+  php tab-transfer %*
 )
