@@ -90,15 +90,6 @@ class CopyTabsFromIphone extends AbstractCopyTabsCommand
         );
     }
 
-    public function checkCommandEnvironment(Console $console): bool
-    {
-        $console->writeln("Checking environment for {$this->driverName} ({$this->getName()})...", OutputInterface::VERBOSITY_VERY_VERBOSE);
-
-        return $this->getDriver($this->getDefaultConsole($console))
-            ->setConsole($console)
-            ->checkEnvironment();
-    }
-
     protected function getArgumentWait(Console $console): int
     {
         $argumentWait = (int)$console->input->getOption('wait');

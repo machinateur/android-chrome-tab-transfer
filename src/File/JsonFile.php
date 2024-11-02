@@ -37,7 +37,7 @@ class JsonFile extends AbstractFileTemplate
     public function render(): string
     {
         try {
-            return \json_encode($this->jsonArray, \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION);
+            return \json_encode($this->tabs, \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION);
         } catch (\JsonException) {
             // We must not throw an exception during the `__toString()` call. Therefor signal with an empty string
             //  that the file should not be written at all (default behaviour with notice in output).

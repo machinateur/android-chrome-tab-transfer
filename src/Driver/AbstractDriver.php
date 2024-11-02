@@ -40,10 +40,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @method AbstractDriver setConsole(Console $console)
- * @method AbstractDriver setInput(InputInterface $input)
- * @method AbstractDriver setOutput(OutputInterface $output)
- * @method AbstractDriver setFileDate(?\DateTimeInterface $date)
+ * @method $this setConsole(Console $console)
+ * @method $this setInput(InputInterface $input)
+ * @method $this setOutput(OutputInterface $output)
+ * @method $this setFileDate(?\DateTimeInterface $date)
  */
 abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInterface, DriverEnvironmentCheckInterface
 {
@@ -71,7 +71,7 @@ abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInte
     {
         $url = $this->getUrl();
 
-        $this->output->writeln(\sprintf('Creating new tab loader for URL "%s" (timeout %ds)', $url, $this->timeout), OutputInterface::VERBOSITY_DEBUG);
+        $this->output->writeln("Creating new tab loader for URL `{$url}` (timeout {$this->timeout}s)...", OutputInterface::VERBOSITY_DEBUG);
 
         return (new CurlTabLoader($url, $this->timeout))
             ->setDebug($this->debug)
@@ -93,6 +93,9 @@ abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInte
     public function checkEnvironment(): bool
     {
         $shellCommand = $this->getShellCommand();
+        if (empty($shellCommand)) {
+            return true;
+        }
 
         $console = $this->getConsole();
         $console->writeln("Checking for availability of `$shellCommand`.", OutputInterface::VERBOSITY_VERY_VERBOSE);
@@ -109,5 +112,8 @@ abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInte
         return $commandAvailable;
     }
 
-    abstract protected function getShellCommand(): string;
+    protected function getShellCommand(): ?string
+    {
+        return null;
+    }
 }

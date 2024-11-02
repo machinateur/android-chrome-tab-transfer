@@ -27,6 +27,10 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Exception;
 
-class ReopenTabsException extends \Exception
+class ReopenTabsException extends CopyTabsException
 {
+    public static function withNoDriverSpecified(): self
+    {
+        return new self('No driver specified.');
+    }
 }

@@ -247,7 +247,7 @@ class LegacyCopyTabsCommand extends Command implements EventSubscriberInterface
         }
 
         if (null === $jsonArray) {
-            $output->writeln('Unable to decode json data!');
+            $output->writeln('Unable to decode JSON data!');
 
             return Command::FAILURE;
         } else {
@@ -257,9 +257,8 @@ class LegacyCopyTabsCommand extends Command implements EventSubscriberInterface
         // Get `file` argument:
 
         $argumentFile = $input->getArgument('file');
+        /** @var string $argumentFile */
         $argumentFile = \pathinfo($argumentFile, \PATHINFO_FILENAME);
-
-        \assert(\is_string($argumentFile));
 
         // Add `date` suffix:
 

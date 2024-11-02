@@ -25,38 +25,27 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\File;
+namespace Machinateur\ChromeTabTransfer\Exception;
 
-class MarkdownFile extends AbstractFileTemplate
+class TabReopenFailedException extends TabLoadingFailedException
 {
-    public function __construct(string $file, array $jsonArray)
+    public static function forErrors(): self
     {
-        parent::__construct($file, $jsonArray);
-
-        $this->filenameSuffix = '-gist';
+        return new self('Tab reopen failed.');
     }
 
-    public function getExtension(): string
+    public static function forSomeErrors(int $errors, int $total): self
     {
-        return 'md';
+        return new self("Failed to transfer {$errors} out of {$total} tabs.");
     }
 
-    public function render(): string
+    public static function forEmptyInput(): self
     {
-        return '# Tabs'
-            . \PHP_EOL
-            . \PHP_EOL
-            . \join(
-                \PHP_EOL, \array_map(static function (array $entry): string {
-                    $url   = $entry['url'];
-                    $title = $entry['title'] ?: $url;
+        return new self('No tabs to reopen given as input.');
+    }
 
-                    return \sprintf('- [%s](%s)', $title, $url);
-                }, $this->tabs)
-            )
-            . \PHP_EOL
-            . \PHP_EOL
-            . 'Created using [machinateur/tab-transfer](https://github.com/machinateur/tab-transfer).'
-            . \PHP_EOL;
+    public static function fromJsonFileLoadingException(JsonFileLoadingException $exception): self
+    {
+        return new self("Failed to load JSON file: {$exception->getMessage()}", previous: $exception);
     }
 }

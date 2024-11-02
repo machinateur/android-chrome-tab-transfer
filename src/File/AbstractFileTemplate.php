@@ -53,7 +53,7 @@ abstract class AbstractFileTemplate implements FileTemplateInterface
 
     public function __construct(
         protected readonly string $file,
-        protected readonly array  $jsonArray,
+        protected readonly array  $tabs,
     ) {
         $this->initializeConsole();
     }
@@ -83,6 +83,7 @@ abstract class AbstractFileTemplate implements FileTemplateInterface
         try {
             return $this->render();
         } catch (\Throwable) {
+            // Avoid throwing exceptions in `__toString()` invocation at any cost.
             return '';
         }
     }

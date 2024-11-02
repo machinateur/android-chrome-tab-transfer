@@ -34,6 +34,11 @@ class CopyTabsException extends \Exception
         return new self("Failed to copy tabs from device! {$exception->getMessage()}", previous: $exception);
     }
 
+    public static function fromTabReopenFailedException(TabReopenFailedException $exception): self
+    {
+        return new self("Failed to transfer tabs to device! {$exception->getMessage()}", previous: $exception);
+    }
+
     public static function forEmptyResult(string $url): self
     {
         return new self("Failed to copy tabs from device! Empty result from URL `{$url}`.");

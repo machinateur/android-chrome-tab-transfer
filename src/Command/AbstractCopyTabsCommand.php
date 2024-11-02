@@ -33,10 +33,12 @@ use Machinateur\ChromeTabTransfer\Driver\DriverEnvironmentCheckInterface;
 use Machinateur\ChromeTabTransfer\Exception\CopyTabsException;
 use Machinateur\ChromeTabTransfer\File\AbstractFileTemplate;
 use Machinateur\ChromeTabTransfer\Service\CopyTabsService;
+use Machinateur\ChromeTabTransfer\Shared\AccessibleInput;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -73,7 +75,7 @@ abstract class AbstractCopyTabsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write. Only the filename is actually considered! The `--date` / `--no-date` flag applies as well.', self::DEFAULT_FILE)
+            ->addArgument('file', InputArgument::OPTIONAL, 'The relative filepath to write. The `--date` / `--no-date` flag applies as well.', self::DEFAULT_FILE)
             ->addOption('date', 'd', InputOption::VALUE_NEGATABLE, "Whether to add the date `{$this->date->format(AbstractFileTemplate::DATE_FORMAT)}` suffix to the filename. Active by Default.", true)
             ->addOption('port', 'p', InputOption::VALUE_REQUIRED, 'The port to forward requests through.', self::DEFAULT_PORT)
             ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'The network timeout for the download request (at last 10 seconds).', self::DEFAULT_TIMEOUT)
@@ -95,10 +97,9 @@ abstract class AbstractCopyTabsCommand extends Command
             throw new \LogicException(\sprintf('The application must contain the %s command.', $command->getName()));
         }
 
-        return $command->execute(new ArrayInput([
-            // Setting the driver name is optional if a `$command` is directly passed as third argument.
-            'driver' => $this->driverName,
-        ]), $console, $this);
+        // Warning: We can only pass the ínput directly in here, because the `driver` option (or any other) is never looked up inside the `CheckEnvironment` command
+        //  when a `$command` (here `$this`) is passed as third argument!
+        return $command->execute($console->input, $console, $this);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -165,19 +166,31 @@ abstract class AbstractCopyTabsCommand extends Command
      * Usually this simply calls through to the {@see DriverEnvironmentCheckInterface::checkEnvironment()} with some
      *  additional debug output to the provided `$console`.
      *
-     * It is not meant to be called directly from within this same class, but from {@see checkCommandEnvironment}, which will
+     * It is not meant to be called directly from within this same class, but from {@see CheckEnvironment}, which will
      *  add important contextual output to the provided `$console`.
      */
-    abstract public function checkCommandEnvironment(Console $console): bool;
-
-    protected function getDefaultConsole(Console $console, array $parameters = []): Console
+    public function checkCommandEnvironment(Console $console): bool
     {
-        $input = new ArrayInput($parameters + [
-            'command' => $this->getName(),
-            'file'    => self::DEFAULT_FILE,
-        ], $this->getDefinition());
+        $console->writeln("Checking environment for {$this->driverName} ({$this->getName()})...", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        return new Console($input, $console->output);
+        return $this->getDriver($this->getDefaultConsole($console))
+            ->setConsole($console)
+            ->checkEnvironment();
+    }
+
+    /**
+     * This is where the magic happens. Here, {@see AccessibleInput::injectDefinition()} is used to combine the original input definition with the definition of
+     *  this very command (i.e. the driver-specific command).
+     */
+    protected function getDefaultConsole(Console $console): Console
+    {
+        if ( ! $console->input instanceof Input) {
+            throw new \LogicException('Incompatible console input.');
+        }
+
+        AccessibleInput::injectDefinition($console->input, $this->getDefinition());
+
+        return new Console($console->input, $console->output);
     }
 
     protected function getArgumentFile(Console $console): string

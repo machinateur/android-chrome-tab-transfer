@@ -65,7 +65,7 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
             ->setDescription('Transfer tabs from your Android\'s Chrome browser.')
             ->addOption('socket', 's', InputOption::VALUE_REQUIRED, 'The socket to forward requests using `adb`.', self::DEFAULT_SOCKET)
             ->addOption('wait', 'w', InputOption::VALUE_REQUIRED, 'The time to wait before starting the download request (between 0 and 60 seconds).', self::DEFAULT_WAIT)
-            ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution. If active, no reopen script will be written.');
+            ->addOption('skip-cleanup', null, InputOption::VALUE_NONE, 'Skip the `adb` cleanup command execution. If active, no reopen script will be written.')
         ;
     }
 
@@ -90,15 +90,6 @@ class CopyTabsFromAndroid extends AbstractCopyTabsCommand
             $this->getArgumentWait($console),
             $this->getArgumentSkipCleanup($console),
         );
-    }
-
-    public function checkCommandEnvironment(Console $console): bool
-    {
-        $console->writeln("Checking environment for {$this->driverName} ({$this->getName()})...", OutputInterface::VERBOSITY_VERY_VERBOSE);
-
-        return $this->getDriver($this->getDefaultConsole($console))
-            ->setConsole($console)
-            ->checkEnvironment();
     }
 
     protected function getArgumentSocket(Console $console): string

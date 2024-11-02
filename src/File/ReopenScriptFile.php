@@ -67,19 +67,17 @@ class ReopenScriptFile extends AbstractFileTemplate
                 . \PHP_EOL
                 . \PHP_EOL
                 . \join(
-                    \PHP_EOL, \array_map(static function (array $entry) use ($port): string {
-                        $url   = $entry['url'];
-                        $title = $entry['title'] ?: $url;
-                        $url   = \rawurlencode($url);
+                    \PHP_EOL, \array_map(static function (array $tab) use ($port): string {
+                        [$url, $title] = self::parseTab($tab);
                         // Batch files require all `%` to be escaped with another `%`.
                         $url = \str_replace('%', '%%', $url);
 
-                        return \sprintf('# %s', $title)
+                        return \sprintf(':: %s', $title)
                             . \PHP_EOL
                             // URLs must be double-quoted to work with curl, and double-quotes also escape other batch characters.
                             . \sprintf("curl -X PUT \"http://localhost:{$port}/json/new?%s\"", $url)
                             . \PHP_EOL;
-                    }, $this->jsonArray)
+                    }, $this->tabs)
                 )
                 . \PHP_EOL
                 . \PHP_EOL
@@ -102,16 +100,14 @@ class ReopenScriptFile extends AbstractFileTemplate
                 . \PHP_EOL
                 . \PHP_EOL
                 . \join(
-                    \PHP_EOL, \array_map(static function (array $entry) use ($port): string {
-                        $url   = $entry['url'];
-                        $title = $entry['title'] ?: $url;
-                        $url   = \rawurlencode($url);
+                    \PHP_EOL, \array_map(static function (array $tab) use ($port): string {
+                        [$url, $title] = self::parseTab($tab);
 
                         return \sprintf('# %s', $title)
                             . \PHP_EOL
                             . \sprintf("curl -X PUT 'http://localhost:{$port}/json/new?%s'", $url)
                             . \PHP_EOL;
-                    }, $this->jsonArray)
+                    }, $this->tabs)
                 )
                 . \PHP_EOL
                 . \PHP_EOL
@@ -119,5 +115,25 @@ class ReopenScriptFile extends AbstractFileTemplate
                 . \PHP_EOL
             )
         ;
+    }
+
+    /**
+     * Parses a tab entry for use in requests (URLs).
+     *
+     * The provided parameter must contain at least the `'url'` key (currently unchecked).
+     *  The `'title'` key, if not given, will default to the `'url'`.
+     *
+     * The output is a tuple of `'url'` and `'title'`, where the URL is {@see \rawurlencode()}d.
+     *  Keep in mind, that for script-file use on Windows systems, all `%` characters have to be replaced (in `.cmd` files).
+     *
+     * @return array{0: string, 1: string}
+     */
+    public static function parseTab(array $tab): array
+    {
+        $url   = $tab['url'];
+        $title = $tab['title'] ?: $url;
+        $url   = \rawurlencode($url);
+
+        return [$url, $title];
     }
 }

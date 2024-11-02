@@ -25,38 +25,32 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\File;
+namespace Machinateur\ChromeTabTransfer\Exception;
 
-class MarkdownFile extends AbstractFileTemplate
+class JsonFileLoadingException extends TabLoadingFailedException
 {
-    public function __construct(string $file, array $jsonArray)
+    public static function whenFileNotFound(string $file): self
     {
-        parent::__construct($file, $jsonArray);
-
-        $this->filenameSuffix = '-gist';
+        return new self("Input file `{$file}` not found.");
     }
 
-    public function getExtension(): string
+    public static function whenFileNotAJsonFile(string $file): self
     {
-        return 'md';
+        return new self("Input file `{$file}` is not a `.json` file.");
     }
 
-    public function render(): string
+    public static function whenFileNotReadable(string $file): self
     {
-        return '# Tabs'
-            . \PHP_EOL
-            . \PHP_EOL
-            . \join(
-                \PHP_EOL, \array_map(static function (array $entry): string {
-                    $url   = $entry['url'];
-                    $title = $entry['title'] ?: $url;
+        return new self("Input file `{$file}` is not readable.");
+    }
 
-                    return \sprintf('- [%s](%s)', $title, $url);
-                }, $this->tabs)
-            )
-            . \PHP_EOL
-            . \PHP_EOL
-            . 'Created using [machinateur/tab-transfer](https://github.com/machinateur/tab-transfer).'
-            . \PHP_EOL;
+    public static function fromJsonException(\JsonException $exception): self
+    {
+        return new self("Failed decoding JSON content with error: {$exception->getMessage()}.", previous: $exception);
+    }
+
+    public static function forMalformedContent(): self
+    {
+        return new self('Detected malformed JSON content.');
     }
 }

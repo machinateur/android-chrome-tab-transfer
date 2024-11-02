@@ -25,38 +25,12 @@
 
 declare(strict_types=1);
 
-namespace Machinateur\ChromeTabTransfer\File;
+namespace Machinateur\ChromeTabTransfer\Exception;
 
-class MarkdownFile extends AbstractFileTemplate
+class CurlException extends TabLoadingFailedException
 {
-    public function __construct(string $file, array $jsonArray)
+    public static function withoutErrorMessage(int $errorCode): self
     {
-        parent::__construct($file, $jsonArray);
-
-        $this->filenameSuffix = '-gist';
-    }
-
-    public function getExtension(): string
-    {
-        return 'md';
-    }
-
-    public function render(): string
-    {
-        return '# Tabs'
-            . \PHP_EOL
-            . \PHP_EOL
-            . \join(
-                \PHP_EOL, \array_map(static function (array $entry): string {
-                    $url   = $entry['url'];
-                    $title = $entry['title'] ?: $url;
-
-                    return \sprintf('- [%s](%s)', $title, $url);
-                }, $this->tabs)
-            )
-            . \PHP_EOL
-            . \PHP_EOL
-            . 'Created using [machinateur/tab-transfer](https://github.com/machinateur/tab-transfer).'
-            . \PHP_EOL;
+        return new self("Failed curl request with error {$errorCode}.");
     }
 }

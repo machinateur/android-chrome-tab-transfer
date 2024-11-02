@@ -53,6 +53,7 @@ $commands = [
     new CopyTabsFromAndroid(),
     new CopyTabsFromIphone(),
 ];
+$commands[] = new \Machinateur\ChromeTabTransfer\Command\ReopenTabs();
 
 $application = new Application(APP_NAME, APP_VERSION);
 $dispatcher  = new EventDispatcher();

@@ -31,6 +31,7 @@ use Machinateur\ChromeTabTransfer\Driver\AbstractDriver;
 use Machinateur\ChromeTabTransfer\Exception\CopyTabsException;
 use Machinateur\ChromeTabTransfer\Exception\FileTemplateDumpException;
 use Machinateur\ChromeTabTransfer\Exception\TabLoadingFailedException;
+use Machinateur\ChromeTabTransfer\Exception\TabReopenFailedException;
 use Machinateur\ChromeTabTransfer\File\AbstractFileTemplate;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -62,6 +63,10 @@ class CopyTabsService
         $driver->stop();
 
         if (isset($exception)) {
+            if ($exception instanceof TabReopenFailedException) {
+                throw CopyTabsException::fromTabReopenFailedException($exception);
+            }
+
             throw CopyTabsException::fromTabLoadingFailedException($exception);
         }
 
@@ -70,12 +75,53 @@ class CopyTabsService
         }
 
         try {
-            $this->writeFileTemplates($driver, $this->getFileTemplates($driver, $tabs));
+            $this->dumpFileTemplates($driver, $this->getFileTemplates($driver, $tabs));
         } catch (FileTemplateDumpException $exception) {
             throw CopyTabsException::fromFileTemplateDumpException($exception);
         }
 
         return $tabs;
+    }
+
+    /**
+     * @param array<string, string> $files
+     * @throws FileTemplateDumpException
+     */
+    private function dumpFileTemplates(AbstractDriver $driver, array $files): void
+    {
+        if (empty($files)) {
+            return;
+        }
+
+        $console = $driver->getConsole();
+        $console->note('Generating output files...');
+
+        foreach ($files as $filename => $content) {
+            $filenameExtension = \pathinfo($filename, \PATHINFO_EXTENSION);
+
+            $console->note("Writing {$filenameExtension} file...");
+            $console->writeln("> {$filename}", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            try {
+                $this->filesystem->dumpFile($filename, $content);
+            } catch (IOException $exception) {
+                $console->writeln('Error writing file: ' . $exception->getMessage(), OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+                if ($driver->debug) {
+                    // Don't throw inside the loop, and never after download process was finished.
+                    //throw FileTemplateDumpException::fromIOException($exception);
+                }
+
+                $console->error("Failed to write {$filename} file!");
+
+                continue;
+            }
+
+            $filenameExtension = \ucfirst($filenameExtension);
+
+            $console->success("{$filenameExtension} file written successfully!");
+            $console->writeln("< {$filename}", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        }
     }
 
     /**
@@ -135,42 +181,5 @@ class CopyTabsService
         }
 
         return $files;
-    }
-
-    /**
-     * @param array<string, string> $files
-     * @throws FileTemplateDumpException
-     */
-    private function writeFileTemplates(AbstractDriver $driver, array $files): void
-    {
-        $console = $driver->getConsole();
-        $console->note('Generating output files...');
-
-        foreach ($files as $filename => $content) {
-            $filenameExtension = \pathinfo($filename, \PATHINFO_EXTENSION);
-
-            $console->note("Writing {$filenameExtension} file...");
-            $console->writeln("> {$filename}", OutputInterface::VERBOSITY_VERY_VERBOSE);
-
-            try {
-                $this->filesystem->dumpFile($filename, $content);
-            } catch (IOException $exception) {
-                $console->writeln('Error writing file: ' . $exception->getMessage(), OutputInterface::VERBOSITY_VERY_VERBOSE);
-
-                if ($driver->debug) {
-                    // Don't throw inside the loop, and never after download process was finished.
-                    //throw FileTemplateDumpException::fromIOException($exception);
-                }
-
-                $console->error("Failed to write {$filename} file!");
-
-                continue;
-            }
-
-            $filenameExtension = \ucfirst($filenameExtension);
-
-            $console->success("{$filenameExtension} file written successfully!");
-            $console->writeln("< {$filename}", OutputInterface::VERBOSITY_VERY_VERBOSE);
-        }
     }
 }

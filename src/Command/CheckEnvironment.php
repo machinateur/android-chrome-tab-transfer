@@ -43,7 +43,8 @@ class CheckEnvironment extends Command
         $this
             ->setName(self::NAME)
             ->setDescription('Check environment for required dependencies ony your system. Implicitly executed before copying tabs.')
-            ->addOption('driver', 'i', InputOption::VALUE_REQUIRED, 'The driver name to use for the check. If not given (default) check for all drivers.');
+            ->addOption('driver', 'i', InputOption::VALUE_REQUIRED, 'The driver name to use for the check. If not given (default) check for all drivers.')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output, ?AbstractCopyTabsCommand $command = null): int
@@ -95,7 +96,7 @@ class CheckEnvironment extends Command
         return $command->checkCommandEnvironment($console);
     }
 
-    protected function findCommand(Console $console, string $driverName): ?AbstractCopyTabsCommand
+    public function findCommand(Console $console, string $driverName): ?AbstractCopyTabsCommand
     {
         $console->writeln("Searching for command with driver `{$driverName}`.", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
