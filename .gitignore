@@ -12,3 +12,5 @@ tab-transfer.phar
 
 /var/
 /node_modules/
+
+.editorconfig
