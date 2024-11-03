@@ -118,8 +118,8 @@ final class Platform
 
             $command = ['start', '""', "\"{$url}\""];
         } elseif (\PHP_OS === 'Darwin') {
-            // On Mac, we can use `open`.
-            $command = ['open', "'{$url}'"];
+            // On Mac, we can use `open`, the URL must not be quoted for some reason.
+            $command = ['open', '-u', "{$url}"];
         } else {
             // Portable command across most Linux distros.
             $command = ['xdg-open', "'{$url}'"];
