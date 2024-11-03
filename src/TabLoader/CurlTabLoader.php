@@ -69,9 +69,6 @@ class CurlTabLoader implements TabLoaderInterface
         $console->writeln("> curl: {$url} ({$timeout})", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $ch = \curl_init();
-
-        // TODO: Add method "PUT" for restore calls!
-
         \curl_setopt($ch, \CURLOPT_URL,            $url);
         \curl_setopt($ch, \CURLOPT_TIMEOUT,        $timeout);
         //\curl_setopt($ch, \CURLOPT_CONNECTTIMEOUT, 10);
