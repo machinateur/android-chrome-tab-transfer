@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Driver;
 
+use Machinateur\ChromeTabTransfer\File\WebsocketWdpClient;
 use Machinateur\ChromeTabTransfer\Platform;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Machinateur\ChromeTabTransfer\TabLoader\CurlReopenTabLoader;
@@ -59,7 +60,7 @@ class RestoreTabsDriver extends AbstractDriver
             $process     = Platform::extractPropertyReference($this->driver, 'process');
             $commandline = & Platform::extractPropertyReference($process, 'commandline');
             // Splice in the `-f` value into the $commandline array, to enable the WDP frontend.
-            \array_splice($commandline, \array_search('-F', $commandline), 1, ['-f', './wdp_client.html']); // TODO: Use constant filename.
+            \array_splice($commandline, \array_search('-F', $commandline), 1, ['-f', WebsocketWdpClient::FILENAME]);
         }
 
         $this->driver->start();
