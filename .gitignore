@@ -14,3 +14,8 @@ tab-transfer.phar
 /node_modules/
 
 .editorconfig
+
+# TODO: Find pattern for \d
+tabs*.json
+tabs*-gist.md
+tabs*-reopen.sh

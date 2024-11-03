@@ -27,7 +27,7 @@
 declare(strict_types=1);
 
 // Define application/metadata constants.
-include 'meta.php';
+include __DIR__ . '/meta.php';
 
 if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     echo PHP_EOL

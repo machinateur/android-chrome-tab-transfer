@@ -2,5 +2,8 @@
   "main": "tab-transfer",
   "output": null,
   "chmod": "0700",
-  "banner-file": "LICENSE"
+  "banner-file": "LICENSE",
+  "files": [
+    "meta.php"
+  ]
 }
