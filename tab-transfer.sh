@@ -41,7 +41,7 @@ else
     echo
 
     # if no dependencies are installed, do that first
-    echo composer.phar install
+    php composer.phar install
   fi
 
   php tab-transfer "$@"
