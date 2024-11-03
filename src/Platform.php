@@ -27,6 +27,8 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer;
 
+use Symfony\Component\Process\Process;
+
 final class Platform
 {
     private function __construct()
@@ -66,7 +68,6 @@ final class Platform
         return '' !== \Phar::running(false);
     }
 
-
     /**
      * Check if a given command is available in the shell environment context.
      *
@@ -97,5 +98,43 @@ final class Platform
     public static function isExecutable(string $filename): bool
     {
         return \is_executable($filename);
+    }
+
+    public static function openInBrowser(string $url, bool $secure = true, bool $debug = false): bool
+    {
+        $url = \filter_var($url, \FILTER_SANITIZE_URL);
+
+        if ( ! \filter_var($url, \FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        if ($secure && ! \preg_match( '#^https?://#i', $url)) {
+            return false;
+        }
+
+        if (Platform::isWindows()) {
+            // Batch files require all `%` to be escaped with another `%`.
+            $url = \str_replace('%', '%%', $url);
+
+            $command = ['start', '""', "\"{$url}\""];
+        } elseif (\PHP_OS === 'Darwin') {
+            // On Mac, we can use `open`.
+            $command = ['open', "'{$url}'"];
+        } else {
+            // Portable command across most Linux distros.
+            $command = ['xdg-open', "'{$url}'"];
+        }
+
+        $browser = new Process($command, timeout: null);
+        $browser->start();
+
+        try {
+            return 0 === $browser->wait();
+        } finally {
+            if ($debug) {
+                \fwrite(\STDOUT, $browser->getOutput());
+                \fwrite(\STDOUT, $browser->getErrorOutput());
+            }
+        }
     }
 }

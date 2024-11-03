@@ -82,8 +82,6 @@ class ReopenTabs extends AbstractCopyTabsCommand
             ->addOption('driver', 'i', InputOption::VALUE_REQUIRED, 'The driver to use for restoration. As of now, only `android` is supported.', self::DEFAULT_DRIVER)
             // TODO: Add `--call` `-c` `some_script.php` option.
         ;
-
-        // TODO: Validate supplying options like `--socket` here would even work. In theory, the ArgvInput/ArrayInput will maintain the initial tokens/parameters.
     }
 
     private ?AbstractCopyTabsCommand $command = null;
@@ -167,12 +165,6 @@ class ReopenTabs extends AbstractCopyTabsCommand
             // Only check the specified driver, if the `--driver` (`-i`) option was specified.
             if (null !== $driverName) {
                 $console->writeln("Driver name specified: {$driverName}.", OutputInterface::VERBOSITY_VERY_VERBOSE);
-
-                if ($command instanceof CopyTabsFromIphone) {
-                    $console->writeln("<fg=black;bg=yellow>The `iphone` driver is not yet supported.</>");
-
-                    throw ReopenTabsException::forUnsupportedDriver($driverName);
-                }
 
                 $command = $this->findCommand($console, $driverName);
             }

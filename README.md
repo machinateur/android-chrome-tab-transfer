@@ -15,7 +15,7 @@ This is one of the most reliable ways to transfer larger amounts of opened tabs 
 * [iOS WebKit Debug Proxy](https://github.com/google/ios-webkit-debug-proxy)
 * [Google Chrome Browser](https://play.google.com/store/apps/details?id=com.android.chrome) on your android phone
 
-TODO: Add iOS docs.
+TODO: Add iOS docs. --> https://developer.chrome.com/blog/debugging-chrome-on-ios/
 
 Make sure to add the location of the platform tools to the `PATH` environment variable. Also make sure to activate the
  usb debugging feature under developer options on your android phone and to connect it to your computer. The browser has

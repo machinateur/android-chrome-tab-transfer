@@ -54,15 +54,11 @@ class RestoreTabsDriver extends AbstractDriver
 
     public function start(): void
     {
-        // TODO: DUMP WDP script here, before the iwdp process starts.
-        //  This might not be necessary, because then the tabs would be read here too,
-        //   which introduces a lot of headache with the flow. Therefor try it first with JIT dump.
-        //  Also make sure to delete the file in stop() again (or even within WdpReopenTabLoader::load() already).
-
         // We have to enable the frontend accordingly, to be able to use the WDP script created above.
         if ($this->driver instanceof IosWebkitDebugProxy) {
+            $process     = Platform::extractPropertyReference($this->driver, 'process');
+            $commandline = & Platform::extractPropertyReference($process, 'commandline');
             // Splice in the `-f` value into the $commandline array, to enable the WDP frontend.
-            $commandline = & Platform::extractPropertyReference($this->driver, 'commandline');
             \array_splice($commandline, \array_search('-F', $commandline), 1, ['-f', './wdp_client.html']); // TODO: Use constant filename.
         }
 
@@ -86,10 +82,13 @@ class RestoreTabsDriver extends AbstractDriver
 
         // On iphone, the `/json/new?...` endpoint is not supported. Bummer. But I've found a workaround using WDP directly.
         if ($this->driver instanceof IosWebkitDebugProxy) {
-            $console->writeln("Creating new tab restorer for iOS using WDP directly.");
+            // Undocumented option, for debugging purposes. The first tab is the target page in almost all scenarios.
+            $targetPage = \abs((int)$console->input->getParameterOption('--', 1));
+
+            $console->writeln("Creating new tab restorer for iOS using WDP directly (page {$targetPage}).");
             $console->writeln('<fg=black;bg=yellow>This is an experimental feature and might be unstable.</>');
 
-            return (new WdpReopenTabLoader($this->port, $this->timeout, $this->file))
+            return (new WdpReopenTabLoader($this->port, $this->timeout, $this->file, $targetPage))
                 ->setDebug($this->debug)
                 ->setOutput($this->output);
         }

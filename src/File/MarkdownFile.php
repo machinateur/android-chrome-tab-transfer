@@ -47,9 +47,9 @@ class MarkdownFile extends AbstractFileTemplate
             . \PHP_EOL
             . \PHP_EOL
             . \join(
-                \PHP_EOL, \array_map(static function (array $entry): string {
-                    $url   = $entry['url'];
-                    $title = $entry['title'] ?: $url;
+                \PHP_EOL, \array_map(static function (array $tab): string {
+                    $url   = $tab['url'];
+                    $title = $tab['title'] ?: $url;
 
                     return \sprintf('- [%s](%s)', $title, $url);
                 }, $this->tabs)
