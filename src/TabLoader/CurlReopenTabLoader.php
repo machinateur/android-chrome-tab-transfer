@@ -89,7 +89,7 @@ class CurlReopenTabLoader extends CurlTabLoader
             }
 
             $url    = \sprintf($this->url, $url);
-            $result = $this->exec($capturedErrorCode, $capturedErrorMessage, $url, $this->timeout);
+            $result = $this->exec($capturedErrorCode, $capturedErrorMessage, $url, $this->timeout, true);
 
             if (null !== $result) {
                 // Print a warning message to the console.

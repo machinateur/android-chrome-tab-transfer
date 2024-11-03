@@ -60,6 +60,7 @@ class CurlTabLoader implements TabLoaderInterface
         ?string &$capturedErrorMessage = null,
         string  $url     = null,
         int     $timeout = null,
+        bool    $isPutRequest     = false,
     ): ?string {
         $url     ??= $this->url;
         $timeout ??= $this->timeout;
@@ -83,6 +84,9 @@ class CurlTabLoader implements TabLoaderInterface
         }
 
         \curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
+        if ($isPutRequest) {
+            \curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, 'PUT');
+        }
 
         /** @var string|null $result */
         $result = \curl_exec($ch) ?: null;
