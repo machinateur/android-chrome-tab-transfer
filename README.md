@@ -1,6 +1,6 @@
 # tab-transfer
 
-A tool to transfer google chrome tabs from your phone to your computer using developer tools.
+A tool to transfer Google Chrome tabs from your phone to your computer using developer tools.
 
 This is the most reliable way to transfer large amounts of opened tabs when switching phones without boundaries.
 
@@ -428,7 +428,7 @@ See [#18](https://github.com/machinateur/tab-transfer/issues/18) for more inform
 > This is supported without manual steps on all platforms in newer versions of this tool.
 >  See [_The reopen script_ above](#the-reopen-script) for details.
 
-#### Detecting network errors
+### Detecting network errors
 
 Time has shown that the communication between `adb` on the computer and the Android device attached via cable can cause
  errors or at least confusion. Thus, the possibility was introduced to get the error message and code of whatever
@@ -495,6 +495,10 @@ Or, to use the dev-dependency, as recommended:
 composer install --dev
 composer run-script box-compile
 ```
+
+### Bundling the Windows installer
+
+TODO
 
 ## License
 
