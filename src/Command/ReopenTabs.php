@@ -55,8 +55,6 @@ class ReopenTabs extends AbstractCopyTabsCommand
 {
     public const NAME = 'reopen-tabs';
 
-    public const DEFAULT_DRIVER = 'android';
-
     public function __construct()
     {
         parent::__construct('restore');
@@ -70,7 +68,7 @@ class ReopenTabs extends AbstractCopyTabsCommand
         // Here we use some black magic to extract a reference to the `$description` property of the InputOption.
         $argumentPortDescription = & Platform::extractPropertyReference($definition->getArgument('file'), 'description');
         // Next we simply write to that reference - et-voilà.
-        $argumentPortDescription = 'The relative filepath to read. This has to point directly to the `tabs.json` file.';
+        $argumentPortDescription = 'The relative filepath to read. The `--date` / `--no-date` flag applies as well.';
 
         // Some more magic to remove the "date" option entirely. I'm just lazy and there would be duplicate code.
         $definitionOptions = & Platform::extractPropertyReference($definition, 'options');
@@ -79,7 +77,7 @@ class ReopenTabs extends AbstractCopyTabsCommand
         $this
             ->setName(self::NAME)
             ->setDescription('Restore tabs to your phone\'s Chrome browser.')
-            ->addOption('driver', 'i', InputOption::VALUE_REQUIRED, 'The driver to use for restoration. As of now, only `android` is supported.', self::DEFAULT_DRIVER)
+            ->addOption('driver', 'i', InputOption::VALUE_REQUIRED, 'The driver to use for restoration.')
             // TODO: Add `--call` `-c` `some_script.php` option.
         ;
     }
@@ -171,7 +169,10 @@ class ReopenTabs extends AbstractCopyTabsCommand
         }
 
         if (null === $command) {
-            // Should not happen, as a default value is set.
+            if (isset($driverName)) {
+                throw ReopenTabsException::forUnsupportedDriver($driverName);
+            }
+
             throw ReopenTabsException::withNoDriverSpecified();
         }
 
