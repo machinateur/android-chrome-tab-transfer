@@ -33,4 +33,9 @@ class ReopenTabsException extends CopyTabsException
     {
         return new self('No driver specified.');
     }
+
+    public static function forUnsupportedDriver(string $driver): self
+    {
+        return new self("Unsupported driver `{$driver}`.");
+    }
 }

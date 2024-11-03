@@ -135,7 +135,6 @@ final class IosWebkitDebugProxy extends AbstractDriver
         $this->process = new Process($command);
     }
 
-
     public function start(): void
     {
         $console = $this->getConsole();

@@ -29,7 +29,7 @@ namespace Machinateur\ChromeTabTransfer\Exception;
 
 use Symfony\Component\Filesystem\Exception\IOException;
 
-class FileTemplateDumpException extends \Exception
+class FileTemplateDumpException extends TabLoadingFailedException
 {
     public static function forExistingFile(string $filename): self
     {

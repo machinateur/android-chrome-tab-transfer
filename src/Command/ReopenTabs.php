@@ -90,8 +90,47 @@ class ReopenTabs extends AbstractCopyTabsCommand
 
     protected function execute(InputInterface $input, OutputInterface $output, ?AbstractCopyTabsCommand $command = null): int
     {
+        $console  = new Console($input, $output);
+
         $this->command = $command;
-        return parent::execute($input, $output);
+
+        // Run the inner logic. This is extracted to a separate method,
+        //  to allow for easier changes in resulting output of the specific driver command.
+        try {
+            $tabs = $this->executeDriver($console);
+        } catch (CopyTabsException $exception) {
+            $console->error($exception->getMessage());
+
+            return Command::FAILURE;
+        }
+
+        $numberOfTabsTransferred = \count($tabs);
+        if (!$numberOfTabsTransferred) {
+            $console->note('No tabs were transferred to the device.');
+        }
+
+        $console->success("Successfully transferred {$numberOfTabsTransferred} tabs to the device.");
+        $console->newLine();
+
+        // With `-vvv` parameter, print the fetched tabs to stdout. Only if there were tabs downloaded, else skip this step.
+        if (0 < $numberOfTabsTransferred && $output->isDebug()) {
+            $table = $console->createTable()
+                ->setHeaders(['Title', 'URL', 'Transferred']);
+
+            foreach ($tabs as $tab) {
+                $title       = $tab['title'] ?: '--';
+                $url         = $tab['url'];
+                $transferred = $tab['transferred'] ?? false;
+
+                $table->addRow([$title, $url, $transferred ? 'yes' : 'no']);
+            }
+            unset($tab, $title, $url, $transferred);
+
+            $table->render();
+            $console->newLine();
+        }
+
+        return Command::SUCCESS;
     }
 
     /**
@@ -128,6 +167,12 @@ class ReopenTabs extends AbstractCopyTabsCommand
             // Only check the specified driver, if the `--driver` (`-i`) option was specified.
             if (null !== $driverName) {
                 $console->writeln("Driver name specified: {$driverName}.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+                if ($command instanceof CopyTabsFromIphone) {
+                    $console->writeln("<fg=black;bg=yellow>The `iphone` driver is not yet supported.</>");
+
+                    throw ReopenTabsException::forUnsupportedDriver($driverName);
+                }
 
                 $command = $this->findCommand($console, $driverName);
             }

@@ -27,9 +27,11 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\Driver;
 
+use Machinateur\ChromeTabTransfer\Platform;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Machinateur\ChromeTabTransfer\TabLoader\CurlReopenTabLoader;
 use Machinateur\ChromeTabTransfer\TabLoader\TabLoaderInterface;
+use Machinateur\ChromeTabTransfer\TabLoader\WdpReopenTabLoader;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -52,6 +54,18 @@ class RestoreTabsDriver extends AbstractDriver
 
     public function start(): void
     {
+        // TODO: DUMP WDP script here, before the iwdp process starts.
+        //  This might not be necessary, because then the tabs would be read here too,
+        //   which introduces a lot of headache with the flow. Therefor try it first with JIT dump.
+        //  Also make sure to delete the file in stop() again (or even within WdpReopenTabLoader::load() already).
+
+        // We have to enable the frontend accordingly, to be able to use the WDP script created above.
+        if ($this->driver instanceof IosWebkitDebugProxy) {
+            // Splice in the `-f` value into the $commandline array, to enable the WDP frontend.
+            $commandline = & Platform::extractPropertyReference($this->driver, 'commandline');
+            \array_splice($commandline, \array_search('-F', $commandline), 1, ['-f', './wdp_client.html']); // TODO: Use constant filename.
+        }
+
         $this->driver->start();
     }
 
@@ -68,10 +82,23 @@ class RestoreTabsDriver extends AbstractDriver
 
     public function getTabLoader(): TabLoaderInterface
     {
+        $console = $this->getConsole();
+
+        // On iphone, the `/json/new?...` endpoint is not supported. Bummer. But I've found a workaround using WDP directly.
+        if ($this->driver instanceof IosWebkitDebugProxy) {
+            $console->writeln("Creating new tab restorer for iOS using WDP directly.");
+            $console->writeln('<fg=black;bg=yellow>This is an experimental feature and might be unstable.</>');
+
+            return (new WdpReopenTabLoader($this->port, $this->timeout, $this->file))
+                ->setDebug($this->debug)
+                ->setOutput($this->output);
+        }
+
         $url  = $this->getUrl();
 
-        $this->output->writeln("Creating new tab restorer for URL `{$url}` (timeout {$this->timeout}s)...", OutputInterface::VERBOSITY_DEBUG);
+        $console->writeln("Creating new tab restorer for URL `{$url}` (timeout {$this->timeout}s)...", OutputInterface::VERBOSITY_DEBUG);
 
+        // Use the default `/json/new?...` endpoint for android.
         return (new CurlReopenTabLoader($url, $this->timeout, $this->file))
             ->setDebug($this->debug)
             ->setOutput($this->output);

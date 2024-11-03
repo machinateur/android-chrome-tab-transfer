@@ -28,10 +28,11 @@ declare(strict_types=1);
 namespace Machinateur\ChromeTabTransfer\TabLoader;
 
 use Machinateur\ChromeTabTransfer\Exception\JsonFileLoadingException;
-use Machinateur\ChromeTabTransfer\Exception\TabLoadingFailedException;
+use Machinateur\ChromeTabTransfer\File\JsonFile;
 use Machinateur\ChromeTabTransfer\Shared\Console;
 use Machinateur\ChromeTabTransfer\Shared\ConsoleTrait;
 use Machinateur\ChromeTabTransfer\Shared\DebugFlagTrait;
+use Machinateur\ChromeTabTransfer\Shared\FileDateTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -42,6 +43,8 @@ use Symfony\Component\Filesystem\Filesystem;
  * @method $this setConsole(Console $console)
  * @method $this setInput(InputInterface $input)
  * @method $this setOutput(OutputInterface $output)
+ * @method $this setDebug(bool $debug)
+ * @method $this setFileDate(?\DateTimeInterface $date)
  */
 class JsonFileTabLoader implements TabLoaderInterface
 {
@@ -49,6 +52,7 @@ class JsonFileTabLoader implements TabLoaderInterface
         __construct as private initializeConsole;
     }
     use DebugFlagTrait;
+    use FileDateTrait;
 
     private readonly Filesystem $filesystem;
 
@@ -67,26 +71,32 @@ class JsonFileTabLoader implements TabLoaderInterface
     {
         $console = $this->getConsole();
         $console->writeln(' ==> ' . __METHOD__ . ':', OutputInterface::VERBOSITY_DEBUG);
-        $console->writeln("Looking for file `{$this->file}` to load stored tabs... ", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        if ( ! $this->filesystem->exists($this->file)) {
-            $console->writeln("File `{$this->file}` not found!", OutputInterface::VERBOSITY_VERY_VERBOSE);
+        // We can only know the actual filename here, as the `--date` flag is injected only later.
+        $file = (new JsonFile($this->file, []))
+            ->setFileDate($this->getFileDate())
+            ->getFilename();
 
-            throw JsonFileLoadingException::whenFileNotFound($this->file);
+        $console->writeln("Looking for file `{$file}` to load stored tabs... ", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+        if ( ! $this->filesystem->exists($file)) {
+            $console->writeln("File `{$file}` not found!", OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+            throw JsonFileLoadingException::whenFileNotFound($file);
         }
 
-        if ('json' !== \pathinfo($this->file, \PATHINFO_EXTENSION)) {
+        if ('json' !== \pathinfo($file, \PATHINFO_EXTENSION)) {
             $console->writeln('The file extension does not match `.json`!', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            throw JsonFileLoadingException::whenFileNotAJsonFile($this->file);
+            throw JsonFileLoadingException::whenFileNotAJsonFile($file);
         }
 
-        $result = @\file_get_contents($this->file);
+        $result = @\file_get_contents($file);
 
         if ( ! $result) {
-            $console->writeln("Error reading file `{$this->file}`: Falsy result.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $console->writeln("Error reading file `{$file}`: Falsy result.", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            throw JsonFileLoadingException::whenFileNotReadable($this->file);
+            throw JsonFileLoadingException::whenFileNotReadable($file);
         }
 
         if ($this->debug) {

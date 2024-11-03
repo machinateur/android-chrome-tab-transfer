@@ -39,6 +39,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @method $this setConsole(Console $console)
  * @method $this setInput(InputInterface $input)
  * @method $this setOutput(OutputInterface $output)
+ * @method $this setDebug(bool $debug)
  */
 class CurlTabLoader implements TabLoaderInterface
 {

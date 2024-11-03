@@ -31,6 +31,7 @@ use Machinateur\ChromeTabTransfer\Driver\AbstractDriver;
 use Machinateur\ChromeTabTransfer\Driver\AndroidDebugBridge;
 use Machinateur\ChromeTabTransfer\Driver\DriverEnvironmentCheckInterface;
 use Machinateur\ChromeTabTransfer\Exception\CopyTabsException;
+use Machinateur\ChromeTabTransfer\Exception\EnvironmentCheckException;
 use Machinateur\ChromeTabTransfer\File\AbstractFileTemplate;
 use Machinateur\ChromeTabTransfer\Service\CopyTabsService;
 use Machinateur\ChromeTabTransfer\Shared\AccessibleInput;
@@ -104,26 +105,12 @@ abstract class AbstractCopyTabsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $console = new Console($input, $output);
+        $console  = new Console($input, $output);
 
-        if ( ! $this->getArgumentSkipCheck($console)) {
-            $return = $this->performEnvironmentCheck($console);
-
-            if (Command::SUCCESS !== $return) {
-                return $return;
-            }
-        } else {
-            $console->note('Skipping environment check.');
-        }
-
+        // Run the inner logic. This is extracted to a separate method,
+        //  to allow for easier changes in resulting output of the specific driver command.
         try {
-            $tabs = $this->service->run(
-                $this->getDriver($console)
-                    ->setConsole($console)
-                    ->setFileDate(
-                        $this->getArgumentDate($console)
-                    )
-            );
+            $tabs = $this->executeDriver($console);
         } catch (CopyTabsException $exception) {
             $console->error($exception->getMessage());
 
@@ -141,7 +128,7 @@ abstract class AbstractCopyTabsCommand extends Command
         // With `-vvv` parameter, print the fetched tabs to stdout. Only if there were tabs downloaded, else skip this step.
         if (0 < $numberOfTabsTransferred && $output->isDebug()) {
             $table = $console->createTable()
-                ->setHeaders(['Title', 'Url']);
+                ->setHeaders(['Title', 'URL']);
 
             foreach ($tabs as $tab) {
                 $title = $tab['title'] ?: '--';
@@ -156,6 +143,30 @@ abstract class AbstractCopyTabsCommand extends Command
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @throws CopyTabsException
+     */
+    final protected function executeDriver(Console $console): array
+    {
+        if ( ! $this->getArgumentSkipCheck($console)) {
+            $return = $this->performEnvironmentCheck($console);
+
+            if (Command::SUCCESS !== $return) {
+                throw EnvironmentCheckException::whenFailed($return);
+            }
+        } else {
+            $console->note('Skipping environment check.');
+        }
+
+        return $this->service->run(
+            $this->getDriver($console)
+                ->setConsole($console)
+                ->setFileDate(
+                    $this->getArgumentDate($console)
+                )
+        );
     }
 
     abstract public function getDriver(Console $console): AbstractDriver;

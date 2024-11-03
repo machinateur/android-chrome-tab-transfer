@@ -54,8 +54,14 @@ class CopyTabsService
         $driver->start();
 
         try {
-            $tabs = $driver->getTabLoader()
-                ->load();
+            $tabLoader = $driver->getTabLoader();
+
+            // Q&D: Just check if the instance looks like it implements the `FileDateTrait`.
+            if (\method_exists($tabLoader, 'setFileDate')) {
+                $tabLoader->setFileDate($driver->getFileDate());
+            }
+
+            $tabs = $tabLoader->load();
         } catch (TabLoadingFailedException $exception) {
             // The exception has to be thrown only after the driver was stopped.
         }
@@ -159,7 +165,6 @@ class CopyTabsService
 
                     continue;
                 }
-
             }
 
             $content = (string) $fileTemplate;

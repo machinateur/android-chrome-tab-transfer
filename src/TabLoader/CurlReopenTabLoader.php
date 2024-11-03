@@ -27,16 +27,21 @@ declare(strict_types=1);
 
 namespace Machinateur\ChromeTabTransfer\TabLoader;
 
-use Machinateur\ChromeTabTransfer\Exception\JsonFileLoadingException;
 use Machinateur\ChromeTabTransfer\Exception\TabReopenFailedException;
 use Machinateur\ChromeTabTransfer\File\ReopenScriptFile;
 use Machinateur\ChromeTabTransfer\Shared\Console;
+use Machinateur\ChromeTabTransfer\Shared\FileDateTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CurlReopenTabLoader extends CurlTabLoader
 {
-    protected readonly JsonFileTabLoader $jsonFileLoader;
+    use FileDateTrait {
+        setFileDate as private parent__setFileDate;
+    }
+    use JsonFileTabLoaderTrait {
+        __construct as private initializeJsonFileTabLoader;
+    }
 
     public function __construct(
         string                 $url,
@@ -45,10 +50,8 @@ class CurlReopenTabLoader extends CurlTabLoader
     ) {
         parent::__construct($url, $timeout);
 
-        $this->jsonFileLoader = new JsonFileTabLoader($file);
+        $this->initializeJsonFileTabLoader($this->file);
     }
-
-    private ?array $tabs = null;
 
     /**
      * @throws TabReopenFailedException
@@ -135,23 +138,7 @@ class CurlReopenTabLoader extends CurlTabLoader
         throw TabReopenFailedException::forErrors();
     }
 
-    /**
-     * Preload the tabs to open from disk.
-     *
-     * @throws TabReopenFailedException
-     */
-    private function loadTabs(): void
-    {
-        try {
-            $this->tabs ??= $this->jsonFileLoader->load();
-        } catch (JsonFileLoadingException $exception) {
-            throw TabReopenFailedException::fromJsonFileLoadingException($exception);
-        }
-
-        if (empty($this->tabs)) {
-            throw TabReopenFailedException::forEmptyInput();
-        }
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public function setOutput(OutputInterface $output): static
     {
@@ -175,5 +162,11 @@ class CurlReopenTabLoader extends CurlTabLoader
     {
         $this->jsonFileLoader->setDebug($debug);
         return parent::setDebug($debug);
+    }
+
+    public function setFileDate(?\DateTimeInterface $date): static
+    {
+        $this->jsonFileLoader->setFileDate($date);
+        return $this->parent__setFileDate($date);
     }
 }
