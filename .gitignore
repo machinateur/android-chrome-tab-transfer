@@ -20,4 +20,5 @@ tabs*.json
 tabs*-gist.md
 tabs*-reopen.sh
 
-/tools/
+/tools/*
+!/tools/tab-transfer.cmd
