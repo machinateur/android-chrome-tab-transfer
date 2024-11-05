@@ -101,17 +101,11 @@ Last updated: `November 3rd, 2024`.
 Independent of your platform, **make sure to always disable USB debuggging after usage**!
  _It can be a security risk to you device, when in contact with public USB ports._
 
-Make sure to add the `adb` and `ios_webkit_debug_proxy` binary locations to the `PATH` environment variable.
- Here's a good explanation for Windows, of how to set up a new path in there:
-
-> https://stackoverflow.com/questions/20564514/adb-is-not-recognized-as-an-internal-or-external-command-operable-program-or/65880336#65880336
-
 Also make sure to activate the usb debugging feature under developer options on your phone,
  as described in the [prerequisites above](#prerequisites) and to connect it to your computer.
 
-The browser has to be running for this tool to work properly.
-
-Sometimes you have to re-connect the USB to get picked up properly.
+The browser on your phone has to be running for this tool to work properly.
+ Sometimes you have to re-connect the USB to get picked up properly.
 
 ### Phar
 
@@ -144,6 +138,11 @@ See also [CLI synopsis](#cli-synopsis) for details on what arguments and options
 ### From source
 
 #### On Windows:
+
+Make sure to add the `adb` and `ios_webkit_debug_proxy` binary locations to the `PATH` environment variable.
+Here's a good explanation for Windows, of how to set up a new path in there:
+
+> https://stackoverflow.com/questions/20564514/adb-is-not-recognized-as-an-internal-or-external-command-operable-program-or/65880336#65880336
 
 ```bash
 git clone git@github.com:machinateur/tab-transfer.git
@@ -498,7 +497,9 @@ composer run-script box-compile
 
 ### Bundling the Windows installer
 
-TODO
+The setup uses Inno Setup Compiler 6, see `winsetup`
+
+> Note: Also might be interesting... https://ss64.com/nt/iexpress.html
 
 ## License
 
