@@ -9,6 +9,8 @@ This is the most reliable way to transfer large amounts of opened tabs when swit
 - Completely cross-platform! Works on *Windows*, *Mac* and *Linux* computers!
 - Also supports *Safari*!
 
+![Cover](res/tab-transfer-terminal.png)
+
 ## Requirements
 
 - Chrome for Android
