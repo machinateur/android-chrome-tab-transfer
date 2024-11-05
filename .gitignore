@@ -19,3 +19,5 @@ tab-transfer.phar
 tabs*.json
 tabs*-gist.md
 tabs*-reopen.sh
+
+/tools/
