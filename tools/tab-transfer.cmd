@@ -45,3 +45,5 @@ php tab-transfer.phar %*
 :: prompt
 echo.
 pause "Press any key to exit..."
+
+exit /b 0
