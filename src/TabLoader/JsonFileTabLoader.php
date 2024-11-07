@@ -49,7 +49,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class JsonFileTabLoader implements TabLoaderInterface
 {
     use ConsoleTrait {
-        __construct as private initializeConsole;
+        ConsoleTrait::__construct as private initializeConsole;
     }
     use DebugFlagTrait;
     use FileDateTrait;

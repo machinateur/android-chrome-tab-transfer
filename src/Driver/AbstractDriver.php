@@ -48,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInterface, DriverEnvironmentCheckInterface
 {
     use ConsoleTrait {
-        __construct as private initializeConsole;
+        ConsoleTrait::__construct as private initializeConsole;
     }
     use FileDateTrait;
 

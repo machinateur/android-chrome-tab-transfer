@@ -44,7 +44,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CurlTabLoader implements TabLoaderInterface
 {
     use ConsoleTrait {
-        __construct as private initializeConsole;
+        ConsoleTrait::__construct as private initializeConsole;
     }
     use DebugFlagTrait;
 

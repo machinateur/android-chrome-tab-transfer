@@ -43,7 +43,7 @@ use Symfony\Component\Filesystem\Path;
 abstract class AbstractFileTemplate implements FileTemplateInterface
 {
     use ConsoleTrait {
-        __construct as private initializeConsole;
+        ConsoleTrait::__construct as private initializeConsole;
     }
     use FileDateTrait;
 
