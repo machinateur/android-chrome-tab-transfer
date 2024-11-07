@@ -1,5 +1,5 @@
 {
-  "name": "machinateur/android-chrome-tab-transfer",
+  "name": "machinateur/tab-transfer",
   "type": "project",
   "description": "A tool to transfer tabs from your android phone to your computer using `adb`.",
   "keywords": [
@@ -20,7 +20,9 @@
     "ext-curl": "*",
     "ext-json": "*",
     "symfony/console": "^5.4",
-    "symfony/event-dispatcher": "^5.4"
+    "symfony/event-dispatcher": "^5.4",
+    "symfony/filesystem": "^5.4",
+    "symfony/process": "^5.4"
   },
   "require-dev": {
     "humbug/box": "^3.16"
@@ -37,7 +39,7 @@
     }
   },
   "scripts": {
-    "copy-tabs": "@php copy-tabs.php",
+    "tab-transfer": "@php tab-transfer",
     "box-compile": "box compile"
   }
 }

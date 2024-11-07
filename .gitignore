@@ -2,10 +2,23 @@
 
 /vendor/
 
+box.json
+
+tab-transfer.phar
+
+/var/
+/node_modules/
+
+.editorconfig
+
 tabs.json
 tabs-gist.md
 tabs-reopen.sh
 
-box.json
+# TODO: Find pattern for \d
+tabs*.json
+tabs*-gist.md
+tabs*-reopen.sh
 
-copy-tabs.phar
+/tools/*
+!/tools/*.cmd

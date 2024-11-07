@@ -24,20 +24,25 @@
 # SOFTWARE.
 #
 
-if [ -f "copy-tabs.phar" ]; then
+if [ -f "tab-transfer.phar" ]; then
   # prefer phar, if present
-  php copy-tabs.phar "$@"
+  php tab-transfer.phar "$@"
 else
-  # TODO: check composer.phar available
-
   # fallback to php script
+
   if [ ! -d "vendor/" ]; then
+    if [ ! -f "composer.phar" ]; then
+      echo "Composer.phar not found!"
+
+      exit 1
+    fi
+
     echo "Dependencies not found. Installing..."
     echo
 
     # if no dependencies are installed, do that first
-    echo composerphar install
+    php composer.phar install
   fi
 
-  php copy-tabs.php "$@"
+  php tab-transfer "$@"
 fi

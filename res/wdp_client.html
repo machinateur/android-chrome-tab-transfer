@@ -1,0 +1,127 @@
+<!--
+Google BSD license https://developers.google.com/google-bsd-license
+Copyright 2012 Google Inc. wrightt@google.com
+
+An example browser-based client.
+-->
+<html>
+<head>
+    <script type="text/javascript">
+        var ws, target_id, cmd_id = 1000, commands = [];
+
+        function onConnect() {
+            ol_clear("send_ol");
+            ol_clear("recv_ol");
+            ws && ws.close();
+
+            var form = document.getElementById("f");
+            var port = form.elements["port"].value;
+            var page_num = form.elements["page_num"].value;
+            var url = "ws://localhost:" + port + "/devtools/page/" + page_num;
+            ws = new WebSocket(url);
+
+            ws.onopen = function () {
+                ol_append("recv_ol", "opened " + url);
+            };
+            ws.onmessage = function (evt) {
+                ol_append("recv_ol", evt.data);
+
+                var in_cmd = JSON.parse(evt.data);
+                if (in_cmd.method === "Target.targetCreated") {
+                    target_id = in_cmd.params.targetInfo.targetId;
+                }
+
+                send_next_command();
+            };
+            ws.onclose = function () {
+                ol_append("recv_ol", "closed");
+            };
+            ws.onerror = function (e) {
+                ol_append("recv_ol", "error: " + e.data);
+            };
+        }
+
+        function onCommand() {
+            if (!ws) {
+                return alert("WebSocket is not connected!");
+            } else if (ws.readyState !== 1) {
+                return alert("WebSocket is not open, current state: " + ws.readyState);
+            } else if (!target_id) {
+                return alert("Page target was not received yet, waiting for \"Target.targetCreated\" message");
+            }
+
+            var text = document.getElementById("commands");
+            var lines = text.value.split("\n");
+
+            lines.forEach((line) => {
+                var msg = line.trim();
+                if (msg) {
+                    commands.push({
+                        id: cmd_id++,
+                        method: "Target.sendMessageToTarget",
+                        params: {targetId: target_id, message: msg}
+                    });
+                }
+            });
+
+            send_next_command();
+        }
+
+        function send_next_command() {
+            if (commands.length > 0) {
+                var out_msg = JSON.stringify(commands.shift());
+                ol_append("send_ol", out_msg);
+                ws.send(out_msg);
+            }
+        };
+
+        function ol_clear(id) {
+            var o_ol = document.getElementById(id);
+            while (o_ol.hasChildNodes()) {
+                o_ol.removeChild(o_ol.lastChild);
+            }
+        }
+
+        function ol_append(id, text) {
+            var o_ol = document.getElementById(id);
+            var o_li = document.createElement("li");
+            o_li.appendChild(document.createTextNode(text));
+            o_ol.appendChild(o_li);
+        }
+    </script>
+    <style type="text/css">
+        .top {
+            vertical-align: top;
+        }
+
+        .right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<form id="f">
+    Inspect localhost:
+    <input name="port" size="3" class="right" value="9222"
+    /><sup><a href="http://localhost:9221" target="_new">?</a></sup
+>/devtools/page/<input name="page_num" class="right" size="5" value="1"
+/><sup><a href="http://localhost:9222" target="_new">?</a></sup>
+    <input type="button" onclick="onConnect()" value="connect"/>
+    <input type="button" onclick="onCommand()" value="send"/>
+    <p>
+<textarea id="commands" rows="5" cols="80">
+{"id":1,"method":"Page.navigate","params": {"url":"http://www.google.com/"}}
+</textarea>
+</form>
+<table>
+    <tr>
+        <td width="50%" class="top">
+            <ol id="send_ol"></ol>
+        </td>
+        <td class="top">
+            <ol id="recv_ol"></ol>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -24,20 +24,26 @@
 
 @echo off
 
-if exist copy-tabs.phar (
-  rem prefer phar, if present
-  php copy-tabs.phar %*
-) else (
-  rem TODO: check composer.phar available
+:: localize variables
+setlocal
 
-  rem fallback to php script
-  if not exist vendor\ (
-    echo "Dependencies not found. Installing..."
-    echo.
+:: set up path
+set "PATH=%cd%\php-8.3.13;%PATH%"
+set "PATH=%cd%\platform-tools-35.0.2;%PATH%"
+set "PATH=%cd%\ios-webkit-debug-proxy-1.9.1;%PATH%"
 
-    rem if no dependencies are installed, do that first
-    php composer.phar install
-  )
+:: prompt
+echo.
+echo " -!-  You can always stop the process by pressing `CTRL + C`"
+echo.
+pause "Press any key to get started..."
+echo.
 
-  php copy-tabs.php %*
-)
+:: run the phar phar
+php tab-transfer.phar %*
+
+:: prompt
+echo.
+pause "Press any key to exit..."
+
+exit /b 0
