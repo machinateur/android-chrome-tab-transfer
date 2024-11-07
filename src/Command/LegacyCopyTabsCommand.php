@@ -372,7 +372,7 @@ class LegacyCopyTabsCommand extends Command implements EventSubscriberInterface
             : 'command -v %s';
 
         return \array_reduce(
-            \explode(PHP_EOL,
+            \explode("\n",
                 (string)\shell_exec(
                     \sprintf($test, $shellCommand)
                 )
@@ -381,7 +381,7 @@ class LegacyCopyTabsCommand extends Command implements EventSubscriberInterface
                 $entry = \trim($entry);
 
                 return $carry
-                    || (\is_file($entry) && \is_executable($entry));
+                    || (\file_exists($entry) && \is_executable($entry));
             }, false
         );
     }

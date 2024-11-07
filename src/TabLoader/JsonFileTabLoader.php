@@ -100,7 +100,7 @@ class JsonFileTabLoader implements TabLoaderInterface
         }
 
         if ($this->debug) {
-            $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode(\PHP_EOL, $result)));
+            $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode("\n", $result)));
         }
 
         try {

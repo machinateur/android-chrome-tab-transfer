@@ -134,7 +134,7 @@ class CurlTabLoader implements TabLoaderInterface
         }
 
         if ($this->debug) {
-            $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode(\PHP_EOL, $result)));
+            $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode("\n", $result)));
         }
 
         $console->success('Successfully downloaded tabs from device!');
