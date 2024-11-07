@@ -91,7 +91,8 @@ final class Platform
 
                 return $carry
                     || (\file_exists($entry) && \is_executable($entry));
-            }, false
+            },
+            false
         );
     }
 
