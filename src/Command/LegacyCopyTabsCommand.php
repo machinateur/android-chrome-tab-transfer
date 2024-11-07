@@ -242,7 +242,7 @@ class LegacyCopyTabsCommand extends Command implements EventSubscriberInterface
 
         try {
             $jsonArray = @\json_decode($jsonString, true, 512, \JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
+        } catch (\JsonException) {
             $jsonArray = null;
         }
 

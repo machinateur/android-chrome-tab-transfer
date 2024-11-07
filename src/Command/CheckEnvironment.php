@@ -129,7 +129,7 @@ class CheckEnvironment extends Command
      *
      * @return array<Command>
      */
-    private function getCommands(string $namespace = 'copy-tabs'): array
+    private function getCommands(): array
     {
         return $this->getApplication()
             ->all('copy-tabs');

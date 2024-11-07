@@ -37,10 +37,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CurlReopenTabLoader extends CurlTabLoader
 {
     use FileDateTrait {
-        setFileDate as private parent__setFileDate;
+        FileDateTrait::setFileDate          as private parent__setFileDate;
     }
     use JsonFileTabLoaderTrait {
-        __construct as private initializeJsonFileTabLoader;
+        JsonFileTabLoaderTrait::__construct as private initializeJsonFileTabLoader;
     }
 
     public function __construct(
@@ -96,7 +96,7 @@ class CurlReopenTabLoader extends CurlTabLoader
                 $console->writeln('< <fg=black;bg=yellow>Unexpected result for tab upload to device!</>', OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 if ($this->debug) {
-                    $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode(\PHP_EOL, $result)));
+                    $console->writeln(\array_map(static fn(string $line): string => "< {$line}", \explode("\n", $result)));
                 }
             } else {
                 $console->writeln('< <fg=black;bg=green>Done.</>', OutputInterface::VERBOSITY_VERY_VERBOSE);
