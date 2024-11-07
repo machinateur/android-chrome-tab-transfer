@@ -42,6 +42,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "{#MyAppPath}\tools\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppPath}\tools\tab-transfer.phar"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyAppPath}\tools\copy-tabs-android.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyAppPath}\tools\copy-tabs-iphone.cmd"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppPath}\tools\php-8.3.13\*"; DestDir: "{app}\php-8.3.13"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppPath}\tools\platform-tools-35.0.2\*"; DestDir: "{app}\platform-tools-35.0.2"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppPath}\tools\ios-webkit-debug-proxy-1.9.1\*"; DestDir: "{app}\ios-webkit-debug-proxy-1.9.1"; Flags: ignoreversion recursesubdirs createallsubdirs
