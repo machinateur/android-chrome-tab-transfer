@@ -2,10 +2,6 @@
 
 /vendor/
 
-tabs.json
-tabs-gist.md
-tabs-reopen.sh
-
 box.json
 
 tab-transfer.phar
@@ -15,10 +11,14 @@ tab-transfer.phar
 
 .editorconfig
 
+tabs.json
+tabs-gist.md
+tabs-reopen.sh
+
 # TODO: Find pattern for \d
 tabs*.json
 tabs*-gist.md
 tabs*-reopen.sh
 
 /tools/*
-!/tools/tab-transfer.cmd
+!/tools/*.cmd

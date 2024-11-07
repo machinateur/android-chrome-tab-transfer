@@ -5,6 +5,7 @@ copy "%cd%\..\tab-transfer.phar" "%cd%\..\tools\tab-transfer.phar"
 copy "%cd%\..\LICENSE"           "%cd%\..\tools\LICENSE"
 
 rem "Assume pandoc to be installed on the system."
+rem "TODO: Fix image import issue (ideally remove the image in the conversion)."
 pandoc -s "%cd%\..\README.md" -o "%cd%\..\tools\README.rtf"
 pandoc -s "%cd%\CREDITS.md" -o "%cd%\..\tools\CREDITS.rtf"
 
