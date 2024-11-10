@@ -117,13 +117,13 @@ final class Platform
             // Batch files require all `%` to be escaped with another `%`.
             $url = \str_replace('%', '%%', $url);
 
-            $command = ['start', '""', "\"{$url}\""];
+            $command = ['start', '', "{$url}"];
         } elseif (\PHP_OS === 'Darwin') {
             // On Mac, we can use `open`, the URL must not be quoted for some reason.
             $command = ['open', '-u', "{$url}"];
         } else {
             // Portable command across most Linux distros.
-            $command = ['xdg-open', "'{$url}'"];
+            $command = ['xdg-open', "{$url}"];
         }
 
         $browser = new Process($command, timeout: null);
