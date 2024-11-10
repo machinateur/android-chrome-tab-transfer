@@ -11,6 +11,8 @@ This is the most reliable way to transfer large amounts of opened tabs when swit
 
 ![The tab-transfer command line interface list of commands](res/tab-transfer-terminal.png)
 
+> [Read the blog article with in-depth information about the inner workings of this tool.](https://machinateur.dev/blog/mobile-tab-hoarders-behold-the-ultimate-tab-transfer-tool)
+
 ## Requirements
 
 - Chrome for Android
