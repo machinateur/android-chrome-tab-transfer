@@ -30,6 +30,7 @@ namespace Machinateur\ChromeTabTransfer\Shared;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * This is like a little hack to modify the definition of any given {@see Input}, by simply extracting it.
@@ -45,8 +46,12 @@ final class AccessibleInput extends ArrayInput
     /**
      * @deprecated This is highly unstable and discouraged.
      */
-    public static function injectDefinition(Input $input, InputDefinition $referenceDefinition): void
+    public static function injectDefinition(InputInterface $input, InputDefinition $referenceDefinition): void
     {
+        if ( ! $input instanceof Input) {
+            throw new \LogicException('Incompatible input given.');
+        }
+
         $def = $input->definition;
 
         foreach ($referenceDefinition->getArguments() as $argument) {

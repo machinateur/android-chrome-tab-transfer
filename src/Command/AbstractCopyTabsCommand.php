@@ -194,10 +194,6 @@ abstract class AbstractCopyTabsCommand extends Command
      */
     protected function getDefaultConsole(Console $console): Console
     {
-        if ( ! $console->input instanceof Input) {
-            throw new \LogicException('Incompatible console input.');
-        }
-
         AccessibleInput::injectDefinition($console->input, $this->getDefinition());
 
         return new Console($console->input, $console->output);
@@ -214,6 +210,10 @@ abstract class AbstractCopyTabsCommand extends Command
 
     protected function getArgumentDate(Console $console): ?\DateTimeInterface
     {
+        if ($console->input->hasParameterOption('--no-date')) {
+            return null;
+        }
+
         return $console->input->getOption('date')
             ? $this->date
             : null;

@@ -74,10 +74,6 @@ class CheckEnvironment extends Command
 
             // Perform checks on all of them, if no single one is specified (default).
             foreach ($this->getCommands() as $command) {
-                if ( ! $command instanceof AbstractCopyTabsCommand) {
-                    continue;
-                }
-
                 $result = $result && $this->check($console, $command);
             }
         }
@@ -127,12 +123,15 @@ class CheckEnvironment extends Command
     /**
      * Load all the available commands inside the `copy-tabs` namespace from the application.
      *
-     * @return array<Command>
+     * @return array<AbstractCopyTabsCommand>
      */
     private function getCommands(): array
     {
-        return $this->getApplication()
+        $commands = $this->getApplication()
             ->all('copy-tabs');
+
+        // Make sure only actual instances of the `AbstractCOpyTabsCommand` base class are returned.
+        return \array_filter($commands, static fn(Command $command): bool => $command instanceof AbstractCopyTabsCommand);
     }
 
     protected function getArgumentDriver(Console $console): ?string

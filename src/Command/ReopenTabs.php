@@ -49,6 +49,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ReopenTabs extends AbstractCopyTabsCommand
 {
+    /**
+     * Override the command name.
+     */
     public const NAME = 'reopen-tabs';
 
     public function __construct()
@@ -58,6 +61,8 @@ class ReopenTabs extends AbstractCopyTabsCommand
 
     protected function configure(): void
     {
+        $this->ignoreValidationErrors();
+
         parent::configure();
 
         $definition = $this->getDefinition();
@@ -65,10 +70,6 @@ class ReopenTabs extends AbstractCopyTabsCommand
         $argumentPortDescription = & Platform::extractPropertyReference($definition->getArgument('file'), 'description');
         // Next we simply write to that reference - et-voilà.
         $argumentPortDescription = 'The relative filepath to read. The `--date` / `--no-date` flag applies as well.';
-
-        // Some more magic to remove the "date" option entirely. I'm just lazy and there would be duplicate code.
-        //$definitionOptions = & Platform::extractPropertyReference($definition, 'options');
-        //unset($definitionOptions['date']);
 
         $this
             ->setName(self::NAME)
@@ -203,5 +204,4 @@ class ReopenTabs extends AbstractCopyTabsCommand
     {
         return $console->input->getOption('driver');
     }
-
 }

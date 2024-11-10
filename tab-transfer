@@ -43,6 +43,7 @@ use Machinateur\ChromeTabTransfer\Command\CheckEnvironment;
 use Machinateur\ChromeTabTransfer\Command\LegacyCopyTabsCommand;
 use Machinateur\ChromeTabTransfer\Command\CopyTabsFromAndroid;
 use Machinateur\ChromeTabTransfer\Command\CopyTabsFromIphone;
+use Machinateur\ChromeTabTransfer\Command\ReopenTabs;
 use Symfony\Component\Console\Application;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -53,7 +54,7 @@ $commands = [
     new CopyTabsFromAndroid(),
     new CopyTabsFromIphone(),
 ];
-$commands[] = new \Machinateur\ChromeTabTransfer\Command\ReopenTabs();
+$commands[] = new ReopenTabs();
 
 $application = new Application(APP_NAME, APP_VERSION);
 $dispatcher  = new EventDispatcher();
