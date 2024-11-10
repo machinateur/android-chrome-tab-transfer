@@ -506,7 +506,7 @@ composer run-script box-compile
 
 ### Bundling the Windows installer
 
-The setup uses Inno Setup Compiler 6, see `winsetup`
+The setup uses Inno Setup Compiler 6, see `winsetup`.
 
 > Note: Also might be interesting... https://ss64.com/nt/iexpress.html
 
