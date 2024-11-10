@@ -81,14 +81,13 @@ abstract class AbstractDriver implements DriverLifecycleInterface, DriverUrlInte
     /**
      * @return array<FileTemplateInterface>
      */
-    public function getFileTemplates(array $jsonArray): array
+    public function getFileTemplates(array $tabs): array
     {
         return [
-            new JsonFile($this->file, $jsonArray),
-            new MarkdownFile($this->file, $jsonArray),
+            new JsonFile($this->file, $tabs),
+            new MarkdownFile($this->file, $tabs),
         ];
     }
-
 
     public function checkEnvironment(): bool
     {

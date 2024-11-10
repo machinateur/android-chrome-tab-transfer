@@ -198,15 +198,15 @@ final class AndroidDebugBridge extends AbstractDriver
         return "http://localhost:{$this->port}/json/list";
     }
 
-    public function getFileTemplates(array $jsonArray): array
+    public function getFileTemplates(array $tabs): array
     {
-        $fileTemplates = parent::getFileTemplates($jsonArray);
+        $fileTemplates = parent::getFileTemplates($tabs);
 
         // Only write the reopen script file, if the cleanup is done properly.
         //  Otherwise, we are at risk of opening those tabs again on the same device.
         if ( ! $this->skipCleanup) {
             $this->output->writeln('Allow reopen script with cleanup enabled.', OutputInterface::VERBOSITY_VERY_VERBOSE);
-            $fileTemplates[] = new ReopenScriptFile($this->file, $jsonArray, $this->port, $this->socket);
+            $fileTemplates[] = new ReopenScriptFile($this->file, $tabs, $this->port, $this->socket);
         } else {
             $this->output->writeln('Skipping reopen script with cleanup disabled.', OutputInterface::VERBOSITY_VERY_VERBOSE);
         }

@@ -107,7 +107,7 @@ class RestoreTabsDriver extends AbstractDriver
     /**
      * No output files.
      */
-    public function getFileTemplates(array $jsonArray): array
+    public function getFileTemplates(array $tabs): array
     {
         return [];
     }
