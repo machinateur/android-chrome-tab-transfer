@@ -67,8 +67,8 @@ class ReopenTabs extends AbstractCopyTabsCommand
         $argumentPortDescription = 'The relative filepath to read. The `--date` / `--no-date` flag applies as well.';
 
         // Some more magic to remove the "date" option entirely. I'm just lazy and there would be duplicate code.
-        $definitionOptions = & Platform::extractPropertyReference($definition, 'options');
-        unset($definitionOptions['date']);
+        //$definitionOptions = & Platform::extractPropertyReference($definition, 'options');
+        //unset($definitionOptions['date']);
 
         $this
             ->setName(self::NAME)
