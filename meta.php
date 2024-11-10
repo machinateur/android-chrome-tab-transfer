@@ -26,4 +26,4 @@
 declare(strict_types=1);
 
 \define('APP_NAME', 'tab-transfer');
-\define('APP_VERSION', '0.5.0');
+\define('APP_VERSION', '0.5.1');
