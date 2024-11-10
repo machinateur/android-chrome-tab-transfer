@@ -19,6 +19,7 @@ tabs-reopen.sh
 tabs*.json
 tabs*-gist.md
 tabs*-reopen.sh
+wdp_client.html
 
 /tools/*
 !/tools/*.cmd
