@@ -9,7 +9,7 @@ This is the most reliable way to transfer large amounts of opened tabs when swit
 - Completely cross-platform! Works on *Windows*, *Mac* and *Linux* computers!
 - Also supports *Safari*!
 
-![Cover](res/tab-transfer-terminal.png)
+![The tab-transfer command line interface list of commands](res/tab-transfer-terminal.png)
 
 ## Requirements
 
@@ -88,6 +88,11 @@ Last updated: `November 3rd, 2024`.
 - [iOS WebKit Debug Proxy GitHub Repository](https://github.com/google/ios-webkit-debug-proxy?tab=readme-ov-file)
 
 ## Usage
+
+See [_which commands to use_](#which-command-to-use) for the commands.
+
+On windows, when using the provided installer, you will have `copy-tabs-android.cmd` and `copy-tabs-iphone.cmd`
+ as shortcuts to the commands. They will run with the default options applied.
 
 ### Prerequisites
 
@@ -370,9 +375,11 @@ More information on discrepancies between the protocols can be found
  in the [Chrome Dev-Tools section](https://github.com/google/ios-webkit-debug-proxy/tree/master?tab=readme-ov-file#chrome-devtools)
   of iOS WebKit Debug Proxy.
 
-As the proxy program does not (yet) support the `new` endpoint to create new targets (tabs), the iOS restoration relies
+As the proxy program does not (yet) support the `/new` endpoint to create new targets (tabs), the iOS restoration relies
  directly on the WebKit Inspector's websocket. This is accomplished by abusing the browser's native websocket support
   to generate an ad-hoc inspector script that sends the correct inspector commands to the connected iPhone.
+
+![The user interface for the WDP client running inside the browser](res/tab-transfer-wdp-ui.png)
 
 ### Legacy command
 
