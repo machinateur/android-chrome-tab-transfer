@@ -42,7 +42,7 @@ class CheckEnvironment extends Command
     {
         $this
             ->setName(self::NAME)
-            ->setDescription('Check environment for required dependencies ony your system. Implicitly executed before copying tabs.')
+            ->setDescription('Check environment for required dependencies on your system. Implicitly executed before copying tabs.')
             ->addOption('driver', 'i', InputOption::VALUE_REQUIRED, 'The driver name to use for the check. If not given (default) check for all drivers.')
         ;
     }
